@@ -1,0 +1,148 @@
+{
+ "date": "2026-10-24",
+ "opener": "A quiet-ish Saturday: skills go vendor-neutral, one guide says fewer subagents, and a new Kimi model draws a crowd.",
+ "ranker": "claude",
+ "schema_version": 1,
+ "skim": [
+  {
+   "discussions": [
+    {
+     "comments": 24,
+     "name": "HN · 92 points",
+     "points": 92,
+     "url": "https://news.ycombinator.com/item?id=50214373"
+    }
+   ],
+   "id": "8173704b50",
+   "line": "Show HN: Corgi, an agent and terminal multiplexer its author has used as a daily driver for a few weeks.",
+   "link_name": "corgi.computer",
+   "source": "hn-front",
+   "source_name": "Hacker News",
+   "title": "Show HN: Corgi, a helpful {agent, terminal} multiplexer",
+   "url": "https://corgi.computer/"
+  },
+  {
+   "discussions": [],
+   "id": "2b6d351b01",
+   "line": "ProductWebBench: a benchmark for frontend coding agents that also checks whether the rest of the site keeps working, not just whether the target got built.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "ProductWebBench: Evaluating Website Continuity Beyond Task Completion",
+   "url": "https://arxiv.org/abs/2610.31118"
+  },
+  {
+   "discussions": [],
+   "id": "5c5a626a2b",
+   "line": "Paper on adaptive skill granularity for coding agents, with runtime routing and macro-to-micro recovery.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Adaptive Skill Granularity for Coding Agents: Runtime Routing and Macro-to-Micro Recovery",
+   "url": "https://arxiv.org/abs/2610.31461"
+  },
+  {
+   "discussions": [],
+   "id": "4ac91b036d",
+   "line": "Experience report on AI-assisted agile engineering of a compliance-critical exam-grading tool: when code gets cheap, evaluation gets scarce.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "When Code Gets Cheap, Evaluation Gets Scarce: An Experience Report on AI-Assisted Agile Software Engineering",
+   "url": "https://arxiv.org/abs/2610.30916"
+  },
+  {
+   "discussions": [
+    {
+     "name": "r/ClaudeCode",
+     "url": "https://www.reddit.com/r/ClaudeCode/comments/1xdtem2/free_credits_you_might_missed/"
+    }
+   ],
+   "id": "7b5d49505b",
+   "line": "Reddit post claims Claude subscriptions come with monthly API credits of $100/200, linking a tracker page.",
+   "link_name": "Reddit",
+   "source": "reddit",
+   "source_name": "Reddit",
+   "title": "Free credits you might missed",
+   "url": "https://www.reddit.com/r/ClaudeCode/comments/1xdtem2/free_credits_you_might_missed/"
+  }
+ ],
+ "stats": {
+  "baseline": [
+   "Anthropic Engineering",
+   "Anthropic News",
+   "One Piece Card Game news"
+  ],
+  "candidates": 59,
+  "failed": [
+   {
+    "error": "HTTP 403",
+    "id": "claude-code-releases",
+    "name": "Claude Code releases"
+   },
+   {
+    "error": "network error: Tunnel connection failed: 403 Forbidden",
+    "id": "latent-space",
+    "name": "Latent Space"
+   },
+   {
+    "error": "network error: Tunnel connection failed: 403 Forbidden",
+    "id": "riftbound-news",
+    "name": "Riftbound news"
+   },
+   {
+    "error": "HTTP 403",
+    "id": "transformers-js-releases",
+    "name": "transformers.js releases"
+   }
+  ],
+  "quiet": [],
+  "sources_ok": 20,
+  "sources_total": 24
+ },
+ "title": "☕ Tech Digest — Sat 24 Oct 2026",
+ "tools": [],
+ "top": [
+  {
+   "discussions": [],
+   "headline": "Anthropic donates the Agent Skills standard to the Agentic AI Foundation",
+   "id": "5107c05a5a",
+   "link_name": "Simon Willison",
+   "source": "simon-willison",
+   "source_name": "Simon Willison",
+   "summary": "Simon Willison relays news from Anthropic: it says it is committed to keeping Agent Skills open, community-driven and vendor-neutral, and is donating the standard to the Agentic AI Foundation.",
+   "title": "Donating Agent Skills to the Agentic AI Foundation",
+   "url": "https://simonwillison.net/2026/Oct/22/donating-agent-skills/",
+   "why": "Skills are on your Claude Code list; this concerns who stewards the format you build against."
+  },
+  {
+   "discussions": [
+    {
+     "name": "r/ClaudeAI",
+     "url": "https://www.reddit.com/r/ClaudeAI/comments/1xdwquj/anthropics_new_guide_oct_22_argues_most_agents/"
+    }
+   ],
+   "headline": "Anthropic guide argues most agents need fewer subagents",
+   "id": "8e54f4608e",
+   "link_name": "Reddit",
+   "source": "reddit",
+   "source_name": "Reddit",
+   "summary": "A Reddit post says Anthropic published an 18-minute guide on Oct 22, 'When to fold subagents into your main agent loop'. Per the post, it favours one main loop with skills and tool search, and mentions cutting Claude Code's system prompt by over 80%.",
+   "title": "Anthropic’s new guide (Oct 22) argues most agents should have fewer subagents: one main loop, skills and tool search instead. Includes “we cut Claude Code’s system prompt by over 80%”",
+   "url": "https://www.reddit.com/r/ClaudeAI/comments/1xdwquj/anthropics_new_guide_oct_22_argues_most_agents/",
+   "why": "Subagent and harness design is your top interest. This is a Reddit summary, so check the original guide."
+  },
+  {
+   "discussions": [],
+   "headline": "Kimi K3.1 Pro lands on the Kimi API, weights promised by Nov 4",
+   "id": "aa97060095",
+   "link_name": "Simon Willison",
+   "source": "simon-willison",
+   "source_name": "Simon Willison",
+   "summary": "Per Simon Willison, Kimi K3.1 Pro is available on the Kimi API but not yet open weights. Moonshot promises full model weights will be released by Nov 4, 2026.",
+   "title": "Introducing Kimi K3.1 Pro",
+   "url": "https://simonwillison.net/2026/Oct/23/kimi-k31-pro/",
+   "why": "Other labs' releases get one line in your list; this is here because it is a major release drawing heavy discussion on Hacker News."
+  }
+ ]
+}
