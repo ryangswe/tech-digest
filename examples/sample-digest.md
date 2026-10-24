@@ -55,28 +55,28 @@ We show that the agent harness changes SWE-bench scores by up to 9 points. Fixtu
 - [ ] 👎 Notes on a fixture context-engineering pattern <!-- id:f901b4bce8 -->
 - [ ] 👍 Measuring Harness Effects on Coding Agent Benchmarks (fixture) <!-- id:db4354a095 -->
 - [ ] 👎 Measuring Harness Effects on Coding Agent Benchmarks (fixture) <!-- id:db4354a095 -->
-- [ ] 👍 Hugging Face blog: transformers.js adds WebGPU vision pipelines (fixt… <!-- id:006d2d7a2e -->
-- [ ] 👎 Hugging Face blog: transformers.js adds WebGPU vision pipelines (fixt… <!-- id:006d2d7a2e -->
+- [ ] 👍 Hugging Face blog: transformers.js adds WebGPU vision pipelines (fixture) <!-- id:006d2d7a2e -->
+- [ ] 👎 Hugging Face blog: transformers.js adds WebGPU vision pipelines (fixture) <!-- id:006d2d7a2e -->
 - [ ] 👍 Hacker News: A fixture database that runs in WebGPU <!-- id:b1f5a4bdc5 -->
 - [ ] 👎 Hacker News: A fixture database that runs in WebGPU <!-- id:b1f5a4bdc5 -->
-- [ ] 👍 Hacker News: Running small vision models in the browser with ONNX (fi… <!-- id:3c85b724dc -->
-- [ ] 👎 Hacker News: Running small vision models in the browser with ONNX (fi… <!-- id:3c85b724dc -->
+- [ ] 👍 Hacker News: Running small vision models in the browser with ONNX (fixture) <!-- id:3c85b724dc -->
+- [ ] 👎 Hacker News: Running small vision models in the browser with ONNX (fixture) <!-- id:3c85b724dc -->
 - [ ] 👍 Simon Willison: Quoting a fixture model card <!-- id:50d5fc0c55 -->
 - [ ] 👎 Simon Willison: Quoting a fixture model card <!-- id:50d5fc0c55 -->
 - [ ] 👍 Latent Space: Inside a coding-agent eval team (fixture) <!-- id:40b02ab6aa -->
 - [ ] 👎 Latent Space: Inside a coding-agent eval team (fixture) <!-- id:40b02ab6aa -->
-- [ ] 👍 Chrome Web Store program policies: Chrome Web Store program policies… <!-- id:0b96f39ad9 -->
-- [ ] 👎 Chrome Web Store program policies: Chrome Web Store program policies… <!-- id:0b96f39ad9 -->
-- [ ] 👍 Riftbound news: Updates to our community tools guidelines for Riftbou… <!-- id:1d9cc30807 -->
-- [ ] 👎 Riftbound news: Updates to our community tools guidelines for Riftbou… <!-- id:1d9cc30807 -->
+- [ ] 👍 Chrome Web Store program policies: Chrome Web Store program policies changed <!-- id:0b96f39ad9 -->
+- [ ] 👎 Chrome Web Store program policies: Chrome Web Store program policies changed <!-- id:0b96f39ad9 -->
+- [ ] 👍 Riftbound news: Updates to our community tools guidelines for Riftbound (fixture). <!-- id:1d9cc30807 -->
+- [ ] 👎 Riftbound news: Updates to our community tools guidelines for Riftbound (fixture). <!-- id:1d9cc30807 -->
 - [ ] 👍 Show HN: Show HN: A fixture deck builder for card games, $2k MRR <!-- id:5adde044e4 -->
 - [ ] 👎 Show HN: Show HN: A fixture deck builder for card games, $2k MRR <!-- id:5adde044e4 -->
 - [ ] 👍 Chrome for Developers: What's new in the side panel API (fixture) <!-- id:7ecc83afa0 -->
 - [ ] 👎 Chrome for Developers: What's new in the side panel API (fixture) <!-- id:7ecc83afa0 -->
 - [ ] 👍 Anthropic (YouTube): Building agents with skills (fixture talk) <!-- id:e4127ba1e4 -->
 - [ ] 👎 Anthropic (YouTube): Building agents with skills (fixture talk) <!-- id:e4127ba1e4 -->
-- [ ] 👍 Anthropic News: Claude API pricing changes for batch and caching (fix… <!-- id:c63d7adc1e -->
-- [ ] 👎 Anthropic News: Claude API pricing changes for batch and caching (fix… <!-- id:c63d7adc1e -->
+- [ ] 👍 Anthropic News: Claude API pricing changes for batch and caching (fixture) <!-- id:c63d7adc1e -->
+- [ ] 👎 Anthropic News: Claude API pricing changes for batch and caching (fixture) <!-- id:c63d7adc1e -->
 - [ ] 👍 Claude Code releases: v9.9.1 <!-- id:6df6dca389 -->
 - [ ] 👎 Claude Code releases: v9.9.1 <!-- id:6df6dca389 -->
 - [ ] 👍 transformers.js releases: 4.9.0 <!-- id:9fe76bb8b9 -->

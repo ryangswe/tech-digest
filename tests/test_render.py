@@ -13,6 +13,7 @@ REPORT = {"sources": {"news": {"name": "News", "ok": True}, "tools": {"name": "T
                       "yt1": {"name": "YT one", "ok": False, "error": "HTTP 404"},
                       "yt2": {"name": "YT two", "ok": False, "error": "HTTP 404"}},
           "quiet": ["optcg-news"]}
+REPORT["sources"]["eng"] = {"name": "Anthropic Engineering", "ok": True, "bootstrapped": True}
 
 
 class PicksValidationTest(unittest.TestCase):
@@ -88,6 +89,11 @@ class PicksValidationTest(unittest.TestCase):
         self.assertIn("5-minute", msgs)
         self.assertNotIn("-word limit", msgs)
 
+    def test_sections_must_be_present(self):
+        for section in ("top", "skim", "tools"):
+            with self.subTest(section=section):
+                self.assertIn(f"{section}: must be present", self.errors(lambda p: p.pop(section)))
+
     def test_date_and_unknown_fields(self):
         self.assertIn("date: must be", self.errors(lambda p: p.update(date="2026-10-22")))
         self.assertIn("unknown field", self.errors(lambda p: p.update(extra=1)))
@@ -126,6 +132,7 @@ class DigestFormatTest(unittest.TestCase):
         foot = self.md.strip().splitlines()[-1]
         self.assertIn("failed today: Reddit (HTTP 429); YT one, YT two (HTTP 404)", foot)
         self.assertIn("no items for 3+ runs: optcg-news", foot)
+        self.assertIn("first look, so today's links were recorded, not shown: Anthropic Engineering", foot)
         self.assertIn("ranked by Claude", foot)
 
     def test_empty_tools_and_quiet_day(self):
@@ -142,6 +149,13 @@ class DigestFormatTest(unittest.TestCase):
         doc["candidates"][5]["source_name"] = doc["candidates"][5]["link_name"] = "Src [x]"
         md = to_markdown(build_digest(good_picks(doc), doc))
         self.assertIn(r"[Src \[x\]](https://example.com/5)", md)
+
+    def test_mentions_and_issue_refs_neutralised(self):
+        doc = candidates_doc()
+        doc["candidates"][4]["title"] = "Thanks @simonw, see anthropics/claude-code#123 and #45"
+        md = to_markdown(build_digest(good_picks(doc), doc))
+        self.assertNotRegex(md, r"@simonw|#123|#45")
+        self.assertIn("@\u2060simonw", md)
 
     def test_json_is_self_contained_and_valid(self):
         self.assertEqual(validate_digest(self.digest), [])

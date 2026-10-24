@@ -116,6 +116,17 @@ class FetchTest(unittest.TestCase):
             run(cfg, {"news": page2}, d / "s", d / "o")
             self.assertEqual([c["title"] for c in cands(d / "o")], ["The second post title"])
 
+    def test_html_links_does_not_bootstrap_on_an_empty_page(self):
+        s = {"id": "news", "name": "News", "type": "html_links", "url": "https://www.anthropic.com/news",
+             "pattern": "^/news/[a-z0-9-]+$", "min_title_chars": 12}
+        cfg = config(s)
+        links = b'<a href="/news/first-post"><h3>The first post title</h3></a>'
+        with TempDir() as d:
+            r = run(cfg, {"news": b"<html>Please verify you are human</html>"}, d / "s", d / "o")
+            self.assertNotIn("bootstrapped", r["sources"]["news"])
+            run(cfg, {"news": links}, d / "s", d / "o")  # first real page: baseline, not news
+            self.assertEqual(cands(d / "o"), [])
+
     def test_page_watch_first_sight_silent_then_reports_changed_text(self):
         s = {"id": "pol", "name": "Policy", "type": "page_watch", "url": "https://p.example/policy"}
         cfg = config(s)

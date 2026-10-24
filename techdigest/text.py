@@ -110,7 +110,7 @@ def parse_date(value: str | None) -> datetime | None:
         v = value.replace("Z", "+00:00")
         if re.match(r"^\d{4}-\d{2}-\d{2}$", v):
             v += "T00:00:00+00:00"
-        v = re.sub(r"(\.\d{6})\d+", r"\1", v)  # nanoseconds
+        v = re.sub(r"\.(\d+)", lambda m: "." + (m.group(1) + "000000")[:6], v)  # any precision
         try:
             dt = datetime.fromisoformat(v)
         except ValueError:

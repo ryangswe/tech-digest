@@ -27,6 +27,11 @@ class WeeklyStatusTest(unittest.TestCase):
         self.assertFalse(weekly_status(self.MONDAY, {"last_proposal": "2026-10-24"},
                                        [vote("2026-10-25", 1)])[0])
 
+    def test_feedback_harvested_on_review_day_counts_next_week(self):
+        # Monday's run proposes before delivery; Monday's delivery then harvests Sunday's issue.
+        lines = [{**vote("2026-10-25", 1), "harvested": "2026-10-26"}]
+        self.assertTrue(weekly_status("2026-11-02", {"last_proposal": "2026-10-26"}, lines)[0])
+
     def test_catches_up_after_a_missed_monday(self):
         self.assertTrue(weekly_status(self.TUESDAY, {"last_proposal": "2026-10-19"},
                                       [vote("2026-10-25", -1)])[0])

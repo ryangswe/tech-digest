@@ -105,6 +105,7 @@ def run_fetch(cfg: Config, *, state_dir: Path, out_dir: Path, now: datetime | No
 
     report: dict[str, dict] = {}
     groups: list[tuple[Source, list[Item]]] = []
+    log(f"{'source':28} {'ok?':4} {'parsed':>6}  (parsed = items in the feed, before age, keyword and seen filters)")
     for src in cfg.enabled_sources():
         entry = {"name": src.name, "ok": False, "fetched": 0, "new": 0}
         items: list[Item] = []
@@ -121,7 +122,7 @@ def run_fetch(cfg: Config, *, state_dir: Path, out_dir: Path, now: datetime | No
             entry["error"] = str(e)[:120] or type(e).__name__
         sst.record(src.id, entry["ok"], entry["fetched"], today)
         items = [i for i in items if _within_window(i, src, cfg, now) and _keyword_ok(i, src)]
-        if src.type == "html_links" and entry["ok"] and not sst.bootstrapped(src.id):
+        if src.type == "html_links" and entry["fetched"] and not sst.bootstrapped(src.id):
             for it in items:  # undated listing: today's links are the baseline, not news
                 seen.mark(it.all_keys(), today)
             sst.set_bootstrapped(src.id, today)
@@ -132,8 +133,8 @@ def run_fetch(cfg: Config, *, state_dir: Path, out_dir: Path, now: datetime | No
             it.summary = truncate(it.summary, limit)
         groups.append((src, items))
         report[src.id] = entry
-        log(f"{src.id:28} {'ok ' if entry['ok'] else 'FAIL'} {entry['fetched']:4} "
-            f"{entry.get('error', '')}")
+        note = entry.get("error", "") or ("baseline recorded (first sight)" if entry.get("bootstrapped") else "")
+        log(f"{src.id:28} {'ok ' if entry['ok'] else 'FAIL'} {entry['fetched']:6}  {note}")
 
     order = {s.id: n for n, s in enumerate(cfg.sources)}
     fresh = [(s, i) for s, i in merge(groups) if not seen.contains_any(i.all_keys())]
@@ -158,6 +159,9 @@ def run_fetch(cfg: Config, *, state_dir: Path, out_dir: Path, now: datetime | No
     write_json(out_dir / "fetch-report.json", full_report)
     seen.save(state_dir / "seen.json")
     sst.save(state_dir / "sources.json")
+    if any(e.get("error") == "TLS certificate error" for e in report.values()):
+        log("note: TLS certificate errors on a Mac usually mean Python lacks CA certificates; "
+            "see docs/setup.md (SSL_CERT_FILE=/etc/ssl/cert.pem)")
     log(f"{len(candidates)} candidates from {sum(1 for e in report.values() if e['ok'])}"
         f"/{len(report)} sources -> {out_dir / 'candidates.json'}")
     return full_report

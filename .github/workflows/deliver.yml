@@ -17,10 +17,6 @@ permissions:
   issues: write
   pull-requests: read
 
-concurrency:
-  group: deliver
-  cancel-in-progress: false
-
 defaults:
   run:
     shell: bash  # -eo pipefail, so `| tee` does not hide failures
@@ -30,6 +26,9 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    concurrency:
+      group: deliver
+      cancel-in-progress: false
     env:
       BRANCH: ${{ github.ref_name }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,7 +57,12 @@ jobs:
             if [ -e "$p" ]; then git add -- "$p"; fi
           done
           git diff --cached --quiet || git commit -q -m "digest: $DAY"
-          git push -q origin HEAD:main 2>&1 | tee -a run.log
+          # main may have moved (an owner push); only digest/ and state/ changed here, so rebase.
+          for attempt in 1 2 3; do
+            if git push -q origin HEAD:main 2>&1 | tee -a run.log; then break; fi
+            [ "$attempt" = 3 ] && exit 1
+            git pull -q --rebase origin main 2>&1 | tee -a run.log
+          done
       - name: Open today's issue and close the previous one
         run: python3 -m techdigest deliver publish --date "$DAY" 2>&1 | tee -a run.log
       - name: Delete the branch

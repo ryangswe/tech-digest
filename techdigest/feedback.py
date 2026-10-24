@@ -73,7 +73,7 @@ def summary(lines: list[dict], today: str, days: int = 30) -> str:
 def weekly_status(today: str, weekly: dict, lines: list[dict]) -> tuple[bool, str]:
     last = weekly.get("last_proposal")
     new = [ln for ln in lines if ln.get("kind") in SIGNALS
-           and (not last or ln.get("harvested", ln.get("digest", "")) > last)]
+           and (not last or ln.get("harvested", ln.get("digest", "")) >= last)]
     if not new:
         return False, "no feedback since the last proposal"
     d = date.fromisoformat(today)

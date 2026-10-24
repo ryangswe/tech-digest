@@ -63,6 +63,7 @@ def build_digest(picks: dict, candidates_doc: dict, report: dict | None = None,
         "failed": [{"id": sid, "name": s.get("name", sid), "error": s.get("error", "")}
                    for sid, s in sources.items() if not s.get("ok")],
         "quiet": list(report.get("quiet", [])),
+        "baseline": [s.get("name", sid) for sid, s in sources.items() if s.get("bootstrapped")],
     }
     return out
 
@@ -94,8 +95,12 @@ def validate_digest(d: dict) -> list[str]:
 
 # --- Markdown ------------------------------------------------------------------------------
 
+ZWJ = "\u2060"  # word joiner: stops GitHub turning @name and #123 into pings and cross-links
+
+
 def _esc(text: str) -> str:
-    return re.sub(r"([\[\]`*_\\])", r"\\\1", text).replace("<", "&lt;")
+    text = re.sub(r"([\[\]`*_\\])", r"\\\1", text).replace("<", "&lt;")
+    return re.sub(r"([@#])(?=[A-Za-z0-9])", "\\1" + ZWJ, text)
 
 
 def _href(url: str) -> str:
@@ -113,7 +118,7 @@ def _links(e: dict) -> str:
     return " · ".join(parts)
 
 
-def _label(text: str, n: int = 70) -> str:
+def _label(text: str, n: int = 90) -> str:
     text = re.sub(r"\s+", " ", text).replace("<!--", "").replace("-->", "").strip()
     return _esc(text if len(text) <= n else text[: n - 1].rstrip() + "…")
 
@@ -147,6 +152,8 @@ def to_markdown(d: dict) -> str:
             by_err.setdefault(f["error"], []).append(f["name"])
         foot += " · failed today: " + "; ".join(
             ", ".join(names) + (f" ({err})" if err else "") for err, names in by_err.items())
+    if st.get("baseline"):
+        foot += " · first look, so today's links were recorded, not shown: " + ", ".join(st["baseline"])
     if st["quiet"]:
         foot += " · no items for 3+ runs: " + ", ".join(st["quiet"])
     foot += " · ranked by " + ("Claude" if d.get("ranker") == "claude" else "the offline keyword ranker (dry run)")

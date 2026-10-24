@@ -64,9 +64,9 @@ def validate_picks(picks: dict, candidates_doc: dict) -> list[str]:
     used: set[str] = set()
     total = word_count(picks.get("opener") or "") if isinstance(picks.get("opener"), str) else 0
     for section, fields in SECTION_FIELDS.items():
-        entries = picks.get(section, [])
+        entries = picks.get(section)
         if not isinstance(entries, list):
-            errs.append(f"{section}: must be a list")
+            errs.append(f"{section}: must be present, as a list (use [] for none)")
             continue
         for n, e in enumerate(entries, 1):
             where = f"{section}[{n}]"

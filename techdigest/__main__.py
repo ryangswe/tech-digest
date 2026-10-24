@@ -66,7 +66,8 @@ def cmd_mark_seen(args) -> int:
     day = json.loads(Path(args.candidates).read_text(encoding="utf-8"))["date"]
     added, pruned = mark_seen(state_dir=Path(args.state), candidates_path=Path(args.candidates),
                               today=day)
-    print(f"seen: +{added} new, -{pruned} pruned (older than 60 days)")
+    print(f"seen: +{added} keys (an item's URL and its discussion threads each count), "
+          f"-{pruned} pruned (older than 60 days)")
     return 0
 
 
@@ -76,8 +77,10 @@ def cmd_status(args) -> int:
     weekly_path = Path(args.state) / "weekly.json"
     weekly = json.loads(weekly_path.read_text()) if weekly_path.exists() else {}
     due, reason = weekly_status(today, weekly, load_lines(Path(args.state) / "feedback.jsonl"))
+    delivered = (Path(args.digest_dir) / f"{today}.md").exists()
     print(json.dumps({"date": today, "branch": f"claude/digest-{today}",
-                      "weekly_review_due": due, "reason": reason}, indent=1))
+                      "already_delivered": delivered,
+                      "weekly_review_due": due and not delivered, "reason": reason}, indent=1))
     return 0
 
 
@@ -169,6 +172,7 @@ def main(argv: list[str] | None = None) -> int:
 
     s = sub.add_parser("status", help="today's date, branch name and whether the weekly review is due")
     s.add_argument("--state", default="state")
+    s.add_argument("--digest-dir", default="digest")
     s.add_argument("--now")
     s.add_argument("--date")
     s.set_defaults(func=cmd_status)

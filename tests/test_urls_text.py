@@ -54,6 +54,7 @@ class TextTest(unittest.TestCase):
         self.assertEqual(parse_date("Thu, 22 Oct 2026 14:00:00 GMT"), datetime(2026, 10, 22, 14, tzinfo=utc))
         self.assertEqual(parse_date("2026-10-22T09:00:00-05:00"), datetime(2026, 10, 22, 14, tzinfo=utc))
         self.assertEqual(parse_date("2026-10-22T14:00:00.123456789Z").hour, 14)
+        self.assertEqual(parse_date("2026-10-22T14:00:00.12Z").microsecond, 120000)
         self.assertIsNone(parse_date("not a date"))
         self.assertIsNone(parse_date(None))
 

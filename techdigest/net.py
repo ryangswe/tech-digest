@@ -42,8 +42,7 @@ def http_get(url: str, user_agent: str, timeout: float = 20, retries: int = 1,
             reason = getattr(e, "reason", e)
             last = FetchError(f"network error: {reason}")
             if isinstance(reason, ssl.SSLCertVerificationError):
-                last = FetchError("TLS certificate check failed (on macOS python.org builds, run "
-                                  "'Install Certificates.command' or set SSL_CERT_FILE)")
+                last = FetchError("TLS certificate error")
                 break
         if attempt < retries:
             sleep(3)

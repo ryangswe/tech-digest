@@ -47,10 +47,23 @@ def integrate(repo: Path, branch: str, base: str = "origin/main", remote: str = 
     refused = [f"{st} {p}" for st, p in changes if p not in allowed or st not in ("A", "M")]
     if refused:
         raise IntegrateError("branch changes paths a scheduled run may not touch: " + ", ".join(refused))
+    fork = _git(repo, "merge-base", base, ref).strip()
+    present = subprocess.run(["git", "-C", str(repo), "cat-file", "-e", f"{fork}:digest/{day}.json"],
+                             capture_output=True).returncode == 0
+    if present:
+        raise IntegrateError(f"a digest for {day} was already delivered before this branch was cut; "
+                             "a second run the same day would lose its items, so it is refused")
     paths = {p for _, p in changes}
     for need in (f"digest/{day}.md", f"digest/{day}.json"):
-        if need not in paths and not (repo / need).exists():
-            raise IntegrateError(f"branch has no {need}")
+        if need not in paths:
+            raise IntegrateError(f"branch has no new {need}")
+    replaced = [p for st, p in changes if p.startswith("digest/") and st != "A"]
+    if replaced:
+        raise IntegrateError(f"a digest for {day} was already delivered; refusing to replace it "
+                             f"({', '.join(replaced)})")
+    newest = max((p.stem for p in (repo / "digest").glob("*.json")), default="")
+    if newest > day:
+        raise IntegrateError(f"stale branch: main already has the {newest} digest, newer than {day}")
 
     def show(path: str) -> str:
         return _git(repo, "show", f"{ref}:{path}")
@@ -66,6 +79,10 @@ def integrate(repo: Path, branch: str, base: str = "origin/main", remote: str = 
         elif path == "state/sources.json" and target.exists():
             ours = SourceState(json.loads(target.read_text(encoding="utf-8")))
             write_json(target, ours.merged_with(SourceState(json.loads(text))).data)
+        elif path == "state/weekly.json" and target.exists():
+            ours = json.loads(target.read_text(encoding="utf-8")).get("last_proposal") or ""
+            theirs = json.loads(text).get("last_proposal") or ""
+            write_json(target, {"last_proposal": max(ours, theirs) or None})
         else:
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(text, encoding="utf-8")
@@ -74,9 +91,9 @@ def integrate(repo: Path, branch: str, base: str = "origin/main", remote: str = 
     errs = validate_digest(digest)
     if digest.get("date") != day:
         errs.append(f"digest date {digest.get('date')!r} does not match the branch's {day}")
-    md = (repo / f"digest/{day}.md").read_text(encoding="utf-8")
-    if md != to_markdown(digest):
-        errs.append(f"digest/{day}.md does not match a fresh render of digest/{day}.json")
     if errs:
         raise IntegrateError("digest failed validation: " + "; ".join(errs))
+    # The JSON is the record; the Markdown (the issue body) is always re-rendered from it here,
+    # so a hand-edited .md cannot reach the owner and renderer changes on main cannot break delivery.
+    (repo / f"digest/{day}.md").write_text(to_markdown(digest), encoding="utf-8")
     return {"date": day, "paths": sorted(paths)}

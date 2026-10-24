@@ -81,6 +81,9 @@ On the task's page, **Run now**. Within about 10 minutes:
 - the repository's **Actions** tab shows *Deliver digest* succeeding;
 - an issue "☕ Tech Digest — …" arrives by email.
 
+A second **Run now** on the same day stops at step 1 on purpose: today's digest is already on
+`main`, and a second batch would mark its items as seen without emailing them.
+
 The first run's digest is thin by design: listing pages without dates (Anthropic News and
 Engineering, Riftbound, One Piece TCG) record today's links as already seen, and page watches
 record a baseline. From the second day, only new items appear.
