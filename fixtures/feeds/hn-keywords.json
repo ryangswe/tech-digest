@@ -1,0 +1,20 @@
+{
+ "hits": [
+  {
+   "objectID": "1000004",
+   "title": "Running small vision models in the browser with ONNX (fixture)",
+   "url": "https://example.org/onnx-vision",
+   "points": 88,
+   "num_comments": 40,
+   "created_at_i": 1792742400
+  },
+  {
+   "objectID": "1000005",
+   "title": "A fixture story about gardening",
+   "url": "https://example.org/garden",
+   "points": 95,
+   "num_comments": 12,
+   "created_at_i": 1792742400
+  }
+ ]
+}

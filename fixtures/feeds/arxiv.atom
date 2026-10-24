@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+<title>arXiv Query</title>
+<entry><id>http://arxiv.org/abs/2610.99001v2</id><title>Measuring Harness Effects on
+  Coding Agent Benchmarks (fixture)</title><link rel="alternate" href="http://arxiv.org/abs/2610.99001v2"/><published>2026-10-22T17:00:00Z</published><updated>2026-10-22T17:00:00Z</updated><summary>We show that the agent harness changes SWE-bench scores by up to 9 points. Fixture abstract.</summary></entry>
+<entry><id>http://arxiv.org/abs/2610.99002v1</id><title>An unrelated fixture paper</title><link rel="alternate" href="http://arxiv.org/abs/2610.99002v1"/><published>2026-10-22T17:00:00Z</published><updated>2026-10-22T17:00:00Z</updated><summary>Fixture abstract.</summary></entry>
+</feed>

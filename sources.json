@@ -1,0 +1,160 @@
+{
+  "timezone": "America/Chicago",
+  "user_agent": "tech-digest/1.0 (personal daily digest; +https://github.com/ryangswe/tech-digest)",
+  "max_candidates": 150,
+  "summary_chars": 300,
+  "default_max_age_days": 2,
+  "request_timeout": 20,
+  "sources": [
+    {
+      "id": "anthropic-news", "name": "Anthropic News", "type": "html_links",
+      "url": "https://www.anthropic.com/news",
+      "pattern": "^/news/[a-z0-9-]+$", "exclude_paths": ["/news/announcements"],
+      "min_title_chars": 12, "tags": ["tool", "anthropic"], "cap": 6
+    },
+    {
+      "id": "anthropic-engineering", "name": "Anthropic Engineering", "type": "html_links",
+      "url": "https://www.anthropic.com/engineering",
+      "pattern": "^/(engineering|research)/[a-z0-9-]+$",
+      "min_title_chars": 12, "tags": ["anthropic"], "cap": 4
+    },
+    {
+      "id": "claude-code-releases", "name": "Claude Code releases", "type": "feed",
+      "url": "https://github.com/anthropics/claude-code/releases.atom",
+      "tags": ["tool"], "cap": 5, "max_age_days": 3, "summary_chars": 1500
+    },
+    {
+      "id": "simon-willison", "name": "Simon Willison", "type": "feed",
+      "url": "https://simonwillison.net/atom/everything/", "cap": 12
+    },
+    {
+      "id": "hn-front", "name": "Hacker News", "type": "hn", "aggregator": true,
+      "url": "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=50",
+      "cap": 20, "max_age_days": 1.5
+    },
+    {
+      "id": "hn-keywords", "name": "Hacker News", "type": "hn", "aggregator": true,
+      "url": "https://hn.algolia.com/api/v1/search_by_date?tags=story&numericFilters=created_at_i%3E{since:24},points%3E%3D30&hitsPerPage=500",
+      "include": [
+        "claude", "anthropic", "claude code", "coding agent", "coding agents", "agentic",
+        "subagent", "subagents", "mcp", "llm", "llms", "context window", "evals",
+        "chrome extension", "browser extension", "chrome web store", "manifest v3", "firefox add-on",
+        "onnx", "webgpu", "wasm", "webassembly", "transformers.js", "on-device",
+        "riftbound", "one piece tcg", "trading card", "indie", "solo developer", "bootstrapped"
+      ],
+      "cap": 15, "max_age_days": 1.5
+    },
+    {
+      "id": "hn-show", "name": "Show HN", "type": "hn", "aggregator": true,
+      "url": "https://hn.algolia.com/api/v1/search_by_date?tags=show_hn&numericFilters=created_at_i%3E{since:48},points%3E%3D100&hitsPerPage=50",
+      "cap": 5, "max_age_days": 2
+    },
+    {
+      "id": "reddit", "name": "Reddit", "type": "feed", "flavor": "reddit", "aggregator": true,
+      "url": "https://www.reddit.com/r/ClaudeAI+ClaudeCode+LocalLLaMA+RiftboundTCG+OnePieceTCG/top/.rss?t=day&limit=40",
+      "cap": 10, "max_age_days": 1.5,
+      "note": "Best effort: Reddit rate-limits unauthenticated feeds."
+    },
+    {
+      "id": "yt-anthropic", "name": "Anthropic (YouTube)", "type": "feed",
+      "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrDwWp7EBBv4NwvScIpBDOA",
+      "tags": ["anthropic"], "cap": 3, "max_age_days": 3
+    },
+    {
+      "id": "yt-ai-engineer", "name": "AI Engineer (YouTube)", "type": "feed",
+      "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCLKPca3kwwd-B59HNr-_lvA",
+      "cap": 3, "max_age_days": 3
+    },
+    {
+      "id": "yt-latent-space", "name": "Latent Space (YouTube)", "type": "feed",
+      "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCxBcwypKK-W3GHd_RZ9FZrQ",
+      "cap": 2, "max_age_days": 3
+    },
+    {
+      "id": "yt-ai-explained", "name": "AI Explained (YouTube)", "type": "feed",
+      "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCNJ1Ymd5yFuUPtn21xtRbbw",
+      "cap": 2, "max_age_days": 3
+    },
+    {
+      "id": "arxiv", "name": "arXiv", "type": "arxiv",
+      "url": "https://export.arxiv.org/api/query?search_query=%28cat%3Acs.AI+OR+cat%3Acs.CL+OR+cat%3Acs.SE%29+AND+%28abs%3A%22coding+agent%22+OR+abs%3A%22coding+agents%22+OR+abs%3A%22software+engineering+agent%22+OR+abs%3A%22agentic+coding%22+OR+abs%3A%22context+engineering%22+OR+abs%3A%22agent+harness%22+OR+abs%3A%22SWE-bench%22+OR+abs%3A%22on-device%22+OR+abs%3A%22in-browser%22%29&sortBy=submittedDate&sortOrder=descending&max_results=60",
+      "cap": 10, "max_age_days": 4
+    },
+    {
+      "id": "latent-space", "name": "Latent Space", "type": "feed",
+      "url": "https://www.latent.space/feed", "cap": 3, "max_age_days": 3
+    },
+    {
+      "id": "hf-blog", "name": "Hugging Face blog", "type": "feed",
+      "url": "https://huggingface.co/blog/feed.xml", "cap": 4, "max_age_days": 3
+    },
+    {
+      "id": "transformers-js-releases", "name": "transformers.js releases", "type": "feed",
+      "url": "https://github.com/huggingface/transformers.js/releases.atom",
+      "tags": ["tool"], "cap": 2, "max_age_days": 3, "summary_chars": 800
+    },
+    {
+      "id": "chrome-dev-blog", "name": "Chrome for Developers", "type": "feed",
+      "url": "https://developer.chrome.com/static/blog/feed.xml", "cap": 4, "max_age_days": 3
+    },
+    {
+      "id": "mozilla-addons-blog", "name": "Mozilla Add-ons blog", "type": "feed",
+      "url": "https://blog.mozilla.org/addons/feed/", "cap": 3, "max_age_days": 4
+    },
+    {
+      "id": "cws-policy", "name": "Chrome Web Store program policies", "type": "page_watch",
+      "url": "https://developer.chrome.com/docs/webstore/program-policies/policies",
+      "tags": ["policy"], "cap": 1
+    },
+    {
+      "id": "amo-policy", "name": "Firefox add-on policies", "type": "page_watch",
+      "url": "https://extensionworkshop.com/documentation/publish/add-on-policies/",
+      "tags": ["policy"], "cap": 1
+    },
+    {
+      "id": "riftbound-news", "name": "Riftbound news", "type": "html_links",
+      "url": "https://riftbound.leagueoflegends.com/en-us/news/",
+      "pattern": "^/en-us/news/[a-z-]+/[a-z0-9-]+/?$", "min_title_chars": 10, "cap": 4
+    },
+    {
+      "id": "optcg-news", "name": "One Piece Card Game news", "type": "html_links",
+      "url": "https://en.onepiece-cardgame.com/news/",
+      "pattern": "^/news/[a-z0-9_-]+\\.html$", "exclude_paths": ["/news/middle-eastern.html"],
+      "min_title_chars": 10, "cap": 4
+    },
+    {
+      "id": "openai-news", "name": "OpenAI News", "type": "feed",
+      "url": "https://openai.com/news/rss.xml", "cap": 2, "max_age_days": 2
+    },
+    {
+      "id": "deepmind-blog", "name": "Google DeepMind blog", "type": "feed",
+      "url": "https://deepmind.google/blog/rss.xml", "cap": 2, "max_age_days": 3
+    },
+    {
+      "id": "riftbound-tool-policy", "name": "Riftbound community-tool policy", "type": "page_watch",
+      "url": "", "enabled": false, "tags": ["policy"], "cap": 1,
+      "note": "OWNER: paste the policy page URL, add its host to the cloud allowlist, set enabled to true."
+    },
+    {
+      "id": "optcg-tool-policy", "name": "One Piece TCG fan-content / tool policy", "type": "page_watch",
+      "url": "", "enabled": false, "tags": ["policy"], "cap": 1,
+      "note": "OWNER: paste the policy page URL, add its host to the cloud allowlist, set enabled to true."
+    },
+    {
+      "id": "extension-1", "name": "OWNER: extension name", "type": "feed",
+      "url": "", "enabled": false, "tags": ["tool"], "cap": 2, "max_age_days": 3,
+      "note": "OWNER: a releases.atom, changelog feed, or switch type to page_watch for a release-notes page. Copy this block per extension."
+    }
+  ],
+  "dry_run_keywords": [
+    {"term": "claude code", "weight": 6}, {"term": "claude", "weight": 4},
+    {"term": "anthropic", "weight": 4}, {"term": "subagent", "weight": 4},
+    {"term": "subagents", "weight": 4}, {"term": "coding agent", "weight": 4},
+    {"term": "harness", "weight": 3}, {"term": "context", "weight": 2},
+    {"term": "evals", "weight": 3}, {"term": "pricing", "weight": 3},
+    {"term": "chrome web store", "weight": 3}, {"term": "extension", "weight": 2},
+    {"term": "onnx", "weight": 3}, {"term": "webgpu", "weight": 3},
+    {"term": "transformers.js", "weight": 3}, {"term": "riftbound", "weight": 3},
+    {"term": "one piece", "weight": 2}, {"term": "indie", "weight": 1}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "excluded": [],
+  "files": {
+    ".claude/agents/explore.md": "5ad8a5c9ea6d6975e572c0faaff6db9bc1345393eb1cce23392be2c3fc7c6693",
+    ".claude/agents/reviewer.md": "d79012452a4a177372e58b30ce86df7a7db23dc162b8e43cbfdc4a33c9fe61be",
+    ".claude/hooks/guard-default-branch.py": "694d4a65cced3879ee6e125a6d039d60c572a8c7e6b205654d19dc4f7f03aba2",
+    ".claude/skills/checkpoint/SKILL.md": "e773f095fca977e9872d0b7c13cc7918b065443de8095896d0097aeb07c1e739",
+    ".claude/workflow/check.py": "c3e23ff58df8e13365d69c85a5a54d1bfbc9557f08d745e426426715e09d6220"
+  },
+  "kit": "641c7d4 2026-10-22",
+  "level": "light"
+}

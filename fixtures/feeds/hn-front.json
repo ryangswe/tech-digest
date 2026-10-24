@@ -1,0 +1,28 @@
+{
+ "hits": [
+  {
+   "objectID": "1000001",
+   "title": "Notes on a fixture context-engineering pattern",
+   "url": "https://simonwillison.net/2026/Oct/22/fixture-context/",
+   "points": 412,
+   "num_comments": 230,
+   "created_at_i": 1792742400
+  },
+  {
+   "objectID": "1000002",
+   "title": "A fixture database that runs in WebGPU",
+   "url": "https://example.org/webgpu-db",
+   "points": 310,
+   "num_comments": 120,
+   "created_at_i": 1792742400
+  },
+  {
+   "objectID": "1000003",
+   "title": "Ask HN: An already-seen fixture question",
+   "url": null,
+   "points": 200,
+   "num_comments": 300,
+   "created_at_i": 1792742400
+  }
+ ]
+}

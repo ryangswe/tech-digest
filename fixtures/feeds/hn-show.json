@@ -1,0 +1,13 @@
+{
+ "hits": [
+  {
+   "objectID": "1000006",
+   "title": "Show HN: A fixture deck builder for card games, $2k MRR",
+   "url": "https://example.org/deck-builder",
+   "points": 150,
+   "num_comments": 60,
+   "created_at_i": 1792742400,
+   "story_text": "I built this solo over six months. Fixture text."
+  }
+ ]
+}

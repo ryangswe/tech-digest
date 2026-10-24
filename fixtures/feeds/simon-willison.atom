@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+<title>Simon Willison's Weblog</title>
+<entry><id>https://simonwillison.net/2026/Oct/22/fixture-context/?utm_source=rss</id><title>Notes on a fixture context-engineering pattern</title><link rel="alternate" href="https://simonwillison.net/2026/Oct/22/fixture-context/?utm_source=rss"/><published>2026-10-22T18:00:00Z</published><updated>2026-10-22T18:00:00Z</updated><summary>&lt;p&gt;A write-up of keeping CLAUDE.md short and moving procedures into skills, with token counts.&amp;nbsp;Fixture text.&lt;/p&gt;</summary></entry>
+<entry><id>https://simonwillison.net/2026/Oct/22/fixture-quote/</id><title>Quoting a fixture model card</title><link rel="alternate" href="https://simonwillison.net/2026/Oct/22/fixture-quote/"/><published>2026-10-22T09:00:00Z</published><updated>2026-10-22T09:00:00Z</updated><summary>A short quotation about pricing per million tokens (fixture).</summary></entry>
+<entry><id>https://simonwillison.net/2026/Sep/01/old/</id><title>Something from last month</title><link rel="alternate" href="https://simonwillison.net/2026/Sep/01/old/"/><published>2026-09-01T09:00:00Z</published><updated>2026-09-01T09:00:00Z</updated><summary>Out of the window.</summary></entry>
+</feed>
