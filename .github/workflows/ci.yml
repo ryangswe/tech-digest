@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches-ignore: ["claude/digest-*"]  # the delivery workflow validates those
   pull_request:
 
 permissions:
@@ -18,5 +19,6 @@ jobs:
       - name: Workflow check
         run: python3 .claude/workflow/check.py
       - name: Tests
-        run: |
-          if [ -d tests ]; then python3 -m unittest discover -s tests; else echo "no tests yet"; fi
+        run: python3 -m unittest discover -s tests
+      - name: Dry run from fixtures
+        run: python3 -m techdigest dry-run

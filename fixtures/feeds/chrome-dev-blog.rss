@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel><title>Chrome for Developers</title>
+<item><title>What's new in the side panel API (fixture)</title><link>https://developer.chrome.com/blog/fixture-side-panel</link><guid>https://developer.chrome.com/blog/fixture-side-panel</guid><pubDate>Wed, 22 Oct 2026 16:00:00 GMT</pubDate><description>Extensions can now open the side panel from a context menu. Fixture.</description></item>
+</channel></rss>

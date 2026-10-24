@@ -1,0 +1,96 @@
+name: Deliver digest
+
+# The scheduled cloud run pushes claude/digest-YYYY-MM-DD. This workflow brings only that day's
+# digest and run state into main, opens the issue as github-actions[bot] (so GitHub emails the
+# owner; your own actions never email you), closes the previous digest after harvesting its
+# feedback, and deletes the branch. A daily watchdog opens an issue if no digest landed.
+
+on:
+  push:
+    branches: ["claude/digest-*"]
+  schedule:
+    - cron: "30 14 * * *"  # 09:30 Chicago in summer, 08:30 in winter
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: deliver
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash  # -eo pipefail, so `| tee` does not hide failures
+
+jobs:
+  deliver:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BRANCH: ${{ github.ref_name }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Integrate the branch's digest and state into main
+        run: |
+          echo "DAY=${BRANCH#claude/digest-}" >> "$GITHUB_ENV"
+          git fetch -q origin "$BRANCH"
+          python3 -m techdigest integrate --branch "$BRANCH" 2>&1 | tee -a run.log
+      - name: Harvest feedback from earlier digest issues
+        run: python3 -m techdigest deliver harvest --date "$DAY" 2>&1 | tee -a run.log
+      - name: Commit to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for p in "digest/$DAY.md" "digest/$DAY.json" state/seen.json state/sources.json \
+                   state/weekly.json state/feedback.jsonl; do
+            if [ -e "$p" ]; then git add -- "$p"; fi
+          done
+          git diff --cached --quiet || git commit -q -m "digest: $DAY"
+          git push -q origin HEAD:main 2>&1 | tee -a run.log
+      - name: Open today's issue and close the previous one
+        run: python3 -m techdigest deliver publish --date "$DAY" 2>&1 | tee -a run.log
+      - name: Delete the branch
+        run: git push -q origin --delete "$BRANCH"
+      - name: Report the failure as an issue
+        if: failure()
+        run: |
+          {
+            echo "The delivery workflow failed for \`$BRANCH\`, so no digest email went out."
+            echo
+            echo "Run log: $RUN_URL"
+            echo
+            echo "The branch is left in place for a look. To retry after a fix, re-run the workflow."
+            echo
+            echo '```'
+            tail -n 60 run.log 2>/dev/null || true
+            echo '```'
+          } > failure.md
+          python3 -m techdigest report-failure --title "Digest run failed: $BRANCH" --body-file failure.md
+
+  watchdog:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Open an issue if today's digest is missing
+        run: python3 -m techdigest check-delivered

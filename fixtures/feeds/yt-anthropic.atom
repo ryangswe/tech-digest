@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+<title>Anthropic</title>
+<entry><id>https://www.youtube.com/watch?v=FixtureAAAA</id><title>Building agents with skills (fixture talk)</title><link rel="alternate" href="https://www.youtube.com/watch?v=FixtureAAAA"/><published>2026-10-22T16:00:00Z</published><updated>2026-10-22T16:00:00Z</updated><media:group><media:description>A talk on packaging procedures as skills. Fixture description.</media:description></media:group></entry>
+</feed>

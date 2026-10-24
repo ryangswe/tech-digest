@@ -1,0 +1,49 @@
+{
+ "sources": {
+  "amo-policy": {
+   "bootstrapped": "2026-10-01",
+   "last_ok": "2026-10-22",
+   "page": {
+    "changed": "2026-09-30",
+    "checked": "2026-10-22",
+    "hash": "64ce0daf09484b7f86a484888ff12a7b8ca23de307f96d1f54c65c5603b1503a",
+    "paras": [
+     "5de67b6e7d",
+     "e762b73519",
+     "eff3145ed1"
+    ]
+   }
+  },
+  "anthropic-engineering": {
+   "bootstrapped": "2026-10-01",
+   "last_ok": "2026-10-22"
+  },
+  "anthropic-news": {
+   "bootstrapped": "2026-10-01",
+   "last_ok": "2026-10-22"
+  },
+  "cws-policy": {
+   "bootstrapped": "2026-10-01",
+   "last_ok": "2026-10-22",
+   "page": {
+    "changed": "2026-09-30",
+    "checked": "2026-10-22",
+    "hash": "bc1c47f440c0cab2670a3c09a357f0a96a125b3799b22f25aa0bb5de08cfe6dc",
+    "paras": [
+     "ed88ab9226",
+     "8302c1972c",
+     "5af53f15cd",
+     "5320712148"
+    ]
+   }
+  },
+  "optcg-news": {
+   "bootstrapped": "2026-10-01",
+   "last_ok": "2026-10-22"
+  },
+  "riftbound-news": {
+   "bootstrapped": "2026-10-01",
+   "last_ok": "2026-10-22"
+  }
+ }
+}

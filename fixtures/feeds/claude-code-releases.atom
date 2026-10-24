@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+<title>Release notes from claude-code</title>
+<entry><id>https://github.com/anthropics/claude-code/releases/tag/v9.9.1</id><title>v9.9.1</title><link rel="alternate" href="https://github.com/anthropics/claude-code/releases/tag/v9.9.1"/><published>2026-10-22T20:00:00Z</published><updated>2026-10-22T20:00:00Z</updated><content type="html">&lt;h2&gt;What's changed&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Added a fixture-only flag to skills&lt;/li&gt;&lt;li&gt;Fixed subagent context compaction in long sessions&lt;/li&gt;&lt;/ul&gt;</content></entry>
+<entry><id>https://github.com/anthropics/claude-code/releases/tag/v9.9.0</id><title>v9.9.0</title><link rel="alternate" href="https://github.com/anthropics/claude-code/releases/tag/v9.9.0"/><published>2026-10-15T20:00:00Z</published><updated>2026-10-15T20:00:00Z</updated><content type="html">Too old for the window</content></entry>
+</feed>
