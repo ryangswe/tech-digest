@@ -2,6 +2,7 @@
  "items": {
   "anthropic.com/engineering/fixture-old": "2026-10-01",
   "anthropic.com/news/fixture-old-post": "2026-10-01",
+  "changelog:claude-code-releases:9.9.0": "2026-10-01",
   "hn:1000003": "2026-10-01"
  },
  "version": 1

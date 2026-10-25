@@ -253,6 +253,64 @@ def parse_html_links(raw: bytes | str, src: Source) -> list[Item]:
     return [Item(src.id, best[u][1][:200], u) for u in order if best[u][1]]
 
 
+# --- Changelogs and package registries ---------------------------------------------------
+
+VERSION_HEAD = re.compile(r"^##\s+\[?v?(\d+\.\d+(?:\.\d+)?(?:[-+][\w.]+)?)\]?(.*)$")
+
+
+def _version_link(src: Source, version: str) -> str:
+    return (src.link_template or src.url).replace("{version}", version)
+
+
+def parse_changelog_md(raw: bytes | str, src: Source, limit: int = 20) -> list[Item]:
+    """A Keep-a-Changelog-style CHANGELOG.md: one item per `## <version>` heading, newest first.
+
+    Undated, so fetch bootstraps it on first sight. The bullets become the summary."""
+    items: list[Item] = []
+    cur: tuple[str, list[str]] | None = None
+
+    def flush():
+        if cur:
+            version, lines = cur
+            bullets = [re.sub(r"^\s*[-*]\s+", "", ln).strip() for ln in lines if ln.strip()]
+            summary = " · ".join(b for b in bullets if not b.startswith("#"))
+            items.append(Item(src.id, f"{src.title_prefix}{version}", _version_link(src, version),
+                              summary, None, key=f"changelog:{src.id}:{version}"))
+
+    for line in _decode(raw).splitlines():
+        m = VERSION_HEAD.match(line.strip())
+        if m:
+            flush()
+            if len(items) >= limit:
+                return items
+            cur = (m.group(1), [])
+        elif cur is not None:
+            cur[1].append(line)
+    flush()
+    if not items:
+        raise ParseError("no `## <version>` headings found")
+    return items[:limit]
+
+
+def parse_npm(raw: bytes | str, src: Source) -> list[Item]:
+    """registry.npmjs.org/<package>: one item per stable version, dated by its publish time."""
+    try:
+        data = json.loads(_decode(raw))
+    except json.JSONDecodeError as e:
+        raise ParseError(f"not valid JSON: {e}")
+    times = data.get("time") or {}
+    name = data.get("name", "")
+    items = []
+    for version, when in times.items():
+        if version in ("created", "modified") or "-" in version:
+            continue
+        items.append(Item(src.id, f"{src.title_prefix}{version}", _version_link(src, version),
+                          f"Version {version} of {name} was published to npm.", parse_date(when),
+                          key=f"npm:{name}:{version}"))
+    items.sort(key=lambda i: i.published.timestamp() if i.published else 0, reverse=True)
+    return items
+
+
 # --- Page watches --------------------------------------------------------------------------
 
 def page_paragraphs(raw: bytes | str) -> list[str]:
@@ -274,4 +332,6 @@ PARSERS = {
     "arxiv": parse_arxiv,
     "hn": parse_hn,
     "html_links": parse_html_links,
+    "changelog_md": parse_changelog_md,
+    "npm": parse_npm,
 }

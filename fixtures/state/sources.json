@@ -22,6 +22,10 @@
    "bootstrapped": "2026-10-01",
    "last_ok": "2026-10-22"
   },
+  "claude-code-releases": {
+   "bootstrapped": "2026-10-01",
+   "last_ok": "2026-10-22"
+  },
   "cws-policy": {
    "bootstrapped": "2026-10-01",
    "last_ok": "2026-10-22",

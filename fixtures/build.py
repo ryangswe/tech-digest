@@ -90,14 +90,17 @@ FILES = {
 <a href="/engineering/fixture-old">Old engineering post (fixture)</a>
 <a href="/engineering/fixture-subagent-evals"><h2>How we evaluate subagent hand-offs in Claude Code (fixture)</h2></a>
 """),
-    "claude-code-releases.atom": ATOM.format(title="Release notes from claude-code", entries="\n".join([
-        atom_entry("v9.9.1", "https://github.com/anthropics/claude-code/releases/tag/v9.9.1",
-                   "2026-10-22T20:00:00Z", content="&lt;h2&gt;What's changed&lt;/h2&gt;&lt;ul&gt;"
-                   "&lt;li&gt;Added a fixture-only flag to skills&lt;/li&gt;&lt;li&gt;Fixed subagent "
-                   "context compaction in long sessions&lt;/li&gt;&lt;/ul&gt;"),
-        atom_entry("v9.9.0", "https://github.com/anthropics/claude-code/releases/tag/v9.9.0",
-                   "2026-10-15T20:00:00Z", content="Too old for the window"),
-    ])),
+    "claude-code-releases.md": """# Changelog
+
+## 9.9.1
+
+- Added a fixture-only flag to skills
+- Fixed subagent context compaction in long sessions
+
+## 9.9.0
+
+- Already seen in the fixture state
+""",
     "simon-willison.atom": ATOM.format(title="Simon Willison's Weblog", entries="\n".join([
         atom_entry("Notes on a fixture context-engineering pattern",
                    "https://simonwillison.net/2026/Oct/22/fixture-context/?utm_source=rss",
@@ -144,9 +147,10 @@ FILES = {
     "hf-blog.rss": RSS.format(title="Hugging Face Blog", items=rss_item(
         "transformers.js adds WebGPU vision pipelines (fixture)", "https://huggingface.co/blog/fixture-webgpu",
         "Thu, 22 Oct 2026 12:00:00 GMT", desc="Fixture post about running detection models in the browser.")),
-    "transformers-js-releases.atom": ATOM.format(title="Release notes from transformers.js", entries=atom_entry(
-        "4.9.0", "https://github.com/huggingface/transformers.js/releases/tag/4.9.0",
-        "2026-10-22T10:00:00Z", content="Adds a fixture ONNX quantisation option.")),
+    "transformers-js-releases.json": json.dumps({"name": "@huggingface/transformers", "time": {
+        "created": "2023-01-01T00:00:00Z", "modified": "2026-10-22T10:00:00Z",
+        "4.8.0": "2026-09-01T10:00:00Z", "4.9.0-next.1": "2026-10-20T10:00:00Z",
+        "4.9.0": "2026-10-22T10:00:00Z"}}, indent=1),
     "chrome-dev-blog.rss": RSS.format(title="Chrome for Developers", items=rss_item(
         "What's new in the side panel API (fixture)", "https://developer.chrome.com/blog/fixture-side-panel",
         "Wed, 22 Oct 2026 16:00:00 GMT", desc="Extensions can now open the side panel from a context menu. Fixture.")),
@@ -170,8 +174,24 @@ FILES = {
 }
 
 
+PARSE_ONLY = {  # parser fixtures not tied to a configured source
+    "github-releases.atom": ATOM.format(title="Release notes from claude-code", entries="\n".join([
+        atom_entry("v9.9.1", "https://github.com/anthropics/claude-code/releases/tag/v9.9.1",
+                   "2026-10-22T20:00:00Z", content="&lt;h2&gt;What's changed&lt;/h2&gt;&lt;ul&gt;"
+                   "&lt;li&gt;Added a fixture-only flag to skills&lt;/li&gt;&lt;li&gt;Fixed subagent "
+                   "context compaction in long sessions&lt;/li&gt;&lt;/ul&gt;"),
+        atom_entry("v9.9.0", "https://github.com/anthropics/claude-code/releases/tag/v9.9.0",
+                   "2026-10-15T20:00:00Z", content="Too old for the window"),
+    ])),
+}
+
+
 def main():
     FEEDS.mkdir(parents=True, exist_ok=True)
+    parse_dir = ROOT / "fixtures/parse"
+    parse_dir.mkdir(parents=True, exist_ok=True)
+    for name, text in PARSE_ONLY.items():
+        (parse_dir / name).write_text(text.strip() + "\n", encoding="utf-8")
     for old in FEEDS.iterdir():
         old.unlink()
     for name, text in FILES.items():
@@ -183,6 +203,7 @@ def main():
         canonical_key("https://www.anthropic.com/news/fixture-old-post"),
         canonical_key("https://www.anthropic.com/engineering/fixture-old"),
         "hn:1000003",
+        "changelog:claude-code-releases:9.9.0",
     ]}
     (STATE / "seen.json").write_text(json.dumps({"version": 1, "items": seen}, indent=1, sort_keys=True) + "\n")
 
@@ -194,7 +215,7 @@ def main():
     boot = {"bootstrapped": "2026-10-01", "last_ok": "2026-10-22"}
     sources = {"sources": {
         "anthropic-news": boot, "anthropic-engineering": boot,
-        "riftbound-news": boot, "optcg-news": boot,
+        "riftbound-news": boot, "optcg-news": boot, "claude-code-releases": boot,
         "cws-policy": {**boot, "page": page(CWS_OLD)},
         "amo-policy": {**boot, "page": page(AMO)},
     }}

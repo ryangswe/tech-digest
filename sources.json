@@ -19,9 +19,11 @@
       "min_title_chars": 12, "tags": ["anthropic"], "cap": 4
     },
     {
-      "id": "claude-code-releases", "name": "Claude Code releases", "type": "feed",
-      "url": "https://github.com/anthropics/claude-code/releases.atom",
-      "tags": ["tool"], "cap": 5, "max_age_days": 3, "summary_chars": 1500
+      "id": "claude-code-releases", "name": "Claude Code releases", "type": "changelog_md",
+      "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+      "link_template": "https://github.com/anthropics/claude-code/releases/tag/v{version}",
+      "title_prefix": "Claude Code ", "tags": ["tool"], "cap": 5, "summary_chars": 1500,
+      "note": "github.com release feeds are blocked in cloud sessions; raw.githubusercontent.com is allowed."
     },
     {
       "id": "simon-willison", "name": "Simon Willison", "type": "feed",
@@ -89,9 +91,10 @@
       "url": "https://huggingface.co/blog/feed.xml", "cap": 4, "max_age_days": 3
     },
     {
-      "id": "transformers-js-releases", "name": "transformers.js releases", "type": "feed",
-      "url": "https://github.com/huggingface/transformers.js/releases.atom",
-      "tags": ["tool"], "cap": 2, "max_age_days": 3, "summary_chars": 800
+      "id": "transformers-js-releases", "name": "transformers.js releases", "type": "npm",
+      "url": "https://registry.npmjs.org/@huggingface/transformers",
+      "link_template": "https://github.com/huggingface/transformers.js/releases/tag/{version}",
+      "title_prefix": "transformers.js ", "tags": ["tool"], "cap": 2, "max_age_days": 3
     },
     {
       "id": "chrome-dev-blog", "name": "Chrome for Developers", "type": "feed",
