@@ -159,7 +159,7 @@ class DigestFormatTest(unittest.TestCase):
 
     def test_json_is_self_contained_and_valid(self):
         self.assertEqual(validate_digest(self.digest), [])
-        self.assertEqual(self.digest["schema_version"], 1)
+        self.assertEqual(self.digest["schema_version"], 2)
         self.assertEqual(to_markdown(self.digest), self.md)  # deterministic re-render
 
     def test_build_refuses_bad_picks(self):

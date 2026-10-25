@@ -15,7 +15,39 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from techdigest.parse import page_hash, page_paragraphs, paragraph_hashes  # noqa: E402
+from techdigest.items import Item  # noqa: E402
 from techdigest.urls import canonical_key  # noqa: E402
+
+CARDS = ROOT / "fixtures/cards"
+
+
+def fixture_cards() -> dict:
+    """Cards as the reader subagent would write them, for the dry run (no Claude offline)."""
+    def cid(url):
+        return Item("x", "x", url).id
+    return {
+        cid("https://www.anthropic.com/engineering/fixture-subagent-evals"): {
+            "kind": "try", "effort": "1h", "fits": ["workflow kit", "Claude Code workflow"],
+            "confidence": "high",
+            "what": "The post describes scoring subagent hand-offs with a fixed rubric and a fresh-context grader (fixture).",
+            "why_you": "Your kit's reviewer already runs in fresh context; a hand-off rubric would make its findings comparable across repos.",
+            "next_step": "Write a five-line rubric for the reviewer's hand-off and try it on the next tech-digest review.",
+        },
+        cid("https://simonwillison.net/2026/Oct/22/fixture-context/"): {
+            "kind": "adopt", "effort": "15m", "fits": ["workflow kit"], "confidence": "medium",
+            "what": "Simon describes keeping CLAUDE.md short and moving procedures into skills, with token counts (fixture).",
+            "why_you": "You already cap CLAUDE.md at 14 KB with the workflow check; this confirms the approach.",
+            "next_step": "Check which CLAUDE.md sections in RiftSight are procedures that could move into a skill.",
+        },
+        cid("https://huggingface.co/blog/fixture-webgpu"): {
+            "kind": "watch", "effort": "half-day", "fits": ["riftsight-vision", "DuelSight"],
+            "confidence": "low",
+            "what": "transformers.js adds WebGPU vision pipelines for running detection models in the browser (fixture).",
+            "why_you": "Card recognition in DuelSight and RiftSight runs in the browser; WebGPU could speed it up.",
+            "next_step": "Wait for a stable release, then benchmark one detection model against the current wasm path.",
+            "flags": ["The page contains instructions addressed to AI agents asking them to change settings."],
+        },
+    }
 
 FEEDS = ROOT / "fixtures/feeds"
 STATE = ROOT / "fixtures/state"
@@ -90,14 +122,17 @@ FILES = {
 <a href="/engineering/fixture-old">Old engineering post (fixture)</a>
 <a href="/engineering/fixture-subagent-evals"><h2>How we evaluate subagent hand-offs in Claude Code (fixture)</h2></a>
 """),
-    "claude-code-releases.atom": ATOM.format(title="Release notes from claude-code", entries="\n".join([
-        atom_entry("v9.9.1", "https://github.com/anthropics/claude-code/releases/tag/v9.9.1",
-                   "2026-10-22T20:00:00Z", content="&lt;h2&gt;What's changed&lt;/h2&gt;&lt;ul&gt;"
-                   "&lt;li&gt;Added a fixture-only flag to skills&lt;/li&gt;&lt;li&gt;Fixed subagent "
-                   "context compaction in long sessions&lt;/li&gt;&lt;/ul&gt;"),
-        atom_entry("v9.9.0", "https://github.com/anthropics/claude-code/releases/tag/v9.9.0",
-                   "2026-10-15T20:00:00Z", content="Too old for the window"),
-    ])),
+    "claude-code-releases.md": """# Changelog
+
+## 9.9.1
+
+- Added a fixture-only flag to skills
+- Fixed subagent context compaction in long sessions
+
+## 9.9.0
+
+- Already seen in the fixture state
+""",
     "simon-willison.atom": ATOM.format(title="Simon Willison's Weblog", entries="\n".join([
         atom_entry("Notes on a fixture context-engineering pattern",
                    "https://simonwillison.net/2026/Oct/22/fixture-context/?utm_source=rss",
@@ -144,9 +179,10 @@ FILES = {
     "hf-blog.rss": RSS.format(title="Hugging Face Blog", items=rss_item(
         "transformers.js adds WebGPU vision pipelines (fixture)", "https://huggingface.co/blog/fixture-webgpu",
         "Thu, 22 Oct 2026 12:00:00 GMT", desc="Fixture post about running detection models in the browser.")),
-    "transformers-js-releases.atom": ATOM.format(title="Release notes from transformers.js", entries=atom_entry(
-        "4.9.0", "https://github.com/huggingface/transformers.js/releases/tag/4.9.0",
-        "2026-10-22T10:00:00Z", content="Adds a fixture ONNX quantisation option.")),
+    "transformers-js-releases.json": json.dumps({"name": "@huggingface/transformers", "time": {
+        "created": "2023-01-01T00:00:00Z", "modified": "2026-10-22T10:00:00Z",
+        "4.8.0": "2026-09-01T10:00:00Z", "4.9.0-next.1": "2026-10-20T10:00:00Z",
+        "4.9.0": "2026-10-22T10:00:00Z"}}, indent=1),
     "chrome-dev-blog.rss": RSS.format(title="Chrome for Developers", items=rss_item(
         "What's new in the side panel API (fixture)", "https://developer.chrome.com/blog/fixture-side-panel",
         "Wed, 22 Oct 2026 16:00:00 GMT", desc="Extensions can now open the side panel from a context menu. Fixture.")),
@@ -170,19 +206,42 @@ FILES = {
 }
 
 
+PARSE_ONLY = {  # parser fixtures not tied to a configured source
+    "github-releases.atom": ATOM.format(title="Release notes from claude-code", entries="\n".join([
+        atom_entry("v9.9.1", "https://github.com/anthropics/claude-code/releases/tag/v9.9.1",
+                   "2026-10-22T20:00:00Z", content="&lt;h2&gt;What's changed&lt;/h2&gt;&lt;ul&gt;"
+                   "&lt;li&gt;Added a fixture-only flag to skills&lt;/li&gt;&lt;li&gt;Fixed subagent "
+                   "context compaction in long sessions&lt;/li&gt;&lt;/ul&gt;"),
+        atom_entry("v9.9.0", "https://github.com/anthropics/claude-code/releases/tag/v9.9.0",
+                   "2026-10-15T20:00:00Z", content="Too old for the window"),
+    ])),
+}
+
+
 def main():
     FEEDS.mkdir(parents=True, exist_ok=True)
+    parse_dir = ROOT / "fixtures/parse"
+    parse_dir.mkdir(parents=True, exist_ok=True)
+    for name, text in PARSE_ONLY.items():
+        (parse_dir / name).write_text(text.strip() + "\n", encoding="utf-8")
     for old in FEEDS.iterdir():
         old.unlink()
     for name, text in FILES.items():
         (FEEDS / name).write_text(text.strip() + "\n", encoding="utf-8")
     (ROOT / "fixtures/now.txt").write_text(NOW + "\n")
 
+    CARDS.mkdir(parents=True, exist_ok=True)
+    for old in CARDS.glob("*.json"):
+        old.unlink()
+    for cid, card in fixture_cards().items():
+        (CARDS / f"{cid}.json").write_text(json.dumps({"id": cid, **card}, indent=1) + "\n")
+
     STATE.mkdir(parents=True, exist_ok=True)
     seen = {k: "2026-10-01" for k in [
         canonical_key("https://www.anthropic.com/news/fixture-old-post"),
         canonical_key("https://www.anthropic.com/engineering/fixture-old"),
         "hn:1000003",
+        "changelog:claude-code-releases:9.9.0",
     ]}
     (STATE / "seen.json").write_text(json.dumps({"version": 1, "items": seen}, indent=1, sort_keys=True) + "\n")
 
@@ -194,7 +253,7 @@ def main():
     boot = {"bootstrapped": "2026-10-01", "last_ok": "2026-10-22"}
     sources = {"sources": {
         "anthropic-news": boot, "anthropic-engineering": boot,
-        "riftbound-news": boot, "optcg-news": boot,
+        "riftbound-news": boot, "optcg-news": boot, "claude-code-releases": boot,
         "cws-policy": {**boot, "page": page(CWS_OLD)},
         "amo-policy": {**boot, "page": page(AMO)},
     }}

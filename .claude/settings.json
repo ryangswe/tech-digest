@@ -9,6 +9,12 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-default-branch.py\"",
             "timeout": 15,
             "statusMessage": "Checking branch before edit"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-run-scope.py\"",
+            "timeout": 15,
+            "statusMessage": "Checking run-branch write scope"
           }
         ]
       }

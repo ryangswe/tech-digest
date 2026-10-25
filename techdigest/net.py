@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import gzip
+import re
 import ssl
 import time
 import urllib.error
@@ -15,8 +16,11 @@ class FetchError(RuntimeError):
     pass
 
 
+MAX_BYTES = 5_000_000
+
+
 def http_get(url: str, user_agent: str, timeout: float = 20, retries: int = 1,
-             sleep=time.sleep) -> bytes:
+             sleep=time.sleep, max_bytes: int = MAX_BYTES) -> bytes:
     req = urllib.request.Request(url, headers={
         "User-Agent": user_agent,
         "Accept-Encoding": "gzip, deflate",
@@ -26,15 +30,21 @@ def http_get(url: str, user_agent: str, timeout: float = 20, retries: int = 1,
     for attempt in range(retries + 1):
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
-                body = resp.read()
+                body = resp.read(max_bytes + 1)
+                if len(body) > max_bytes:
+                    raise FetchError("page over 5 MB")
                 enc = (resp.headers.get("Content-Encoding") or "").lower()
             if enc == "gzip" or body[:2] == b"\x1f\x8b":
                 body = gzip.decompress(body)
+                if len(body) > 4 * max_bytes:
+                    raise FetchError("page over 5 MB")
             elif enc == "deflate":
                 body = zlib.decompress(body)
             return body
         except urllib.error.HTTPError as e:
             reason = e.headers.get("x-deny-reason") if e.headers else None
+            if reason and not re.match(r"^[a-z_]{1,40}$", reason):  # the proxy's tokens only
+                reason = None
             last = FetchError(f"HTTP {e.code}" + (f" ({reason})" if reason else ""))
             if e.code not in (429, 500, 502, 503, 504):
                 break

@@ -1,0 +1,8 @@
+{
+ "https://arxiv.org/abs/2610.30571": "arxiv-abs.html",
+ "https://example.org/blog/fresh-reviewer": "blog.html",
+ "https://example.org/notes/4-2": "no-article.html",
+ "https://example.org/app": "js-only.html",
+ "https://example.org/ten-skills": "injection.html",
+ "https://raw.githubusercontent.com/example/skill-lint/HEAD/README.md": "github-readme.md"
+}

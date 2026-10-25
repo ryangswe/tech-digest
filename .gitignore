@@ -2,3 +2,7 @@ build/
 __pycache__/
 *.pyc
 .DS_Store
+# Bookmark backlog: raw post and page text and per-bookmark verdicts stay local (the repo is
+# public); reports/bookmarks-summary.md and backlog/queue.json are committed.
+backlog/raw/
+backlog/triage/

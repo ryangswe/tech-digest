@@ -3,12 +3,14 @@ import unittest
 from techdigest.parse import (ParseError, page_paragraphs, parse_arxiv, parse_feed, parse_hn,
                               parse_html_links)
 
-from helpers import feed, src
+from techdigest.parse import parse_changelog_md, parse_npm
+
+from helpers import ROOT, feed, src
 
 
 class FeedTest(unittest.TestCase):
     def test_atom_github_releases(self):
-        items = parse_feed(feed("claude-code-releases.atom"), src())
+        items = parse_feed((ROOT / "fixtures/parse/github-releases.atom").read_bytes(), src())
         self.assertEqual([i.title for i in items], ["v9.9.1", "v9.9.0"])
         self.assertIn("Fixed subagent context compaction", items[0].summary)
         self.assertNotIn("<", items[0].summary)
@@ -70,6 +72,36 @@ class FeedTest(unittest.TestCase):
         raw = b"<rss><channel><item><title></title><link>https://e.com</link></item>" \
               b"<item><title>No link</title></item></channel></rss>"
         self.assertEqual(parse_feed(raw, src()), [])
+
+
+class ChangelogNpmTest(unittest.TestCase):
+    def test_changelog_versions_with_bullets_as_summary(self):
+        s = src(type="changelog_md", title_prefix="Claude Code ",
+                link_template="https://github.com/anthropics/claude-code/releases/tag/v{version}")
+        items = parse_changelog_md(feed("claude-code-releases.md"), s)
+        self.assertEqual([i.title for i in items], ["Claude Code 9.9.1", "Claude Code 9.9.0"])
+        self.assertEqual(items[0].url, "https://github.com/anthropics/claude-code/releases/tag/v9.9.1")
+        self.assertEqual(items[0].summary, "Added a fixture-only flag to skills · "
+                                           "Fixed subagent context compaction in long sessions")
+        self.assertEqual(items[0].key, "changelog:test:9.9.1")
+        self.assertIsNone(items[0].published)
+
+    def test_changelog_heading_forms_and_limit(self):
+        raw = "# Changelog\n\n## [v1.2.0] - 2026-10-01\n- a\n\n## 1.1.0\n- b\n## 1.0.0\n- c\n"
+        items = parse_changelog_md(raw, src(type="changelog_md"), limit=2)
+        self.assertEqual([i.title for i in items], ["1.2.0", "1.1.0"])
+
+    def test_changelog_without_versions_fails(self):
+        with self.assertRaises(ParseError):
+            parse_changelog_md("<html>blocked</html>", src(type="changelog_md"))
+
+    def test_npm_stable_versions_newest_first(self):
+        s = src(type="npm", title_prefix="transformers.js ",
+                link_template="https://github.com/huggingface/transformers.js/releases/tag/{version}")
+        items = parse_npm(feed("transformers-js-releases.json"), s)
+        self.assertEqual([i.title for i in items], ["transformers.js 4.9.0", "transformers.js 4.8.0"])
+        self.assertEqual(items[0].published.isoformat(), "2026-10-22T10:00:00+00:00")
+        self.assertEqual(items[0].key, "npm:@huggingface/transformers:4.9.0")
 
 
 class ArxivTest(unittest.TestCase):

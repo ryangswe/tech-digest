@@ -6,6 +6,7 @@ import json
 import shutil
 from pathlib import Path
 
+from .cards import load_projects, validate_dir
 from .config import load_config
 from .fetch import mark_seen, run_fetch
 from .net import fixture_getter
@@ -29,7 +30,14 @@ def dry_run(config_path: Path = Path("sources.json"), fixtures: Path = Path("fix
     cands = json.loads((out / "candidates.json").read_text(encoding="utf-8"))
     picks = keyword_picks(cands, cfg.dry_run_keywords)
     write_json(out / "picks.json", picks)
-    digest = build_digest(picks, cands, report, ranker="keywords")
+    cards = []
+    if (fixtures / "cards").is_dir():  # what the reader subagent would have written
+        items = {c["id"]: c for c in cands["candidates"]}
+        projects = load_projects(Path(config_path).parent / "profile.md")
+        cards, errors = validate_dir(fixtures / "cards", items, projects)
+        if errors:
+            raise ValueError(f"fixture cards invalid: {errors}")
+    digest = build_digest(picks, cands, report, ranker="keywords", cards=cards)
     _, md = write_digest(digest, out / "digest")
     mark_seen(state_dir=state, candidates_path=out / "candidates.json", today=cands["date"])
     log(f"dry run digest: {md}")

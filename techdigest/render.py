@@ -12,6 +12,19 @@ from datetime import date
 from pathlib import Path
 
 from . import picks as P
+from .cards import validate_cards_structure
+
+CARDS_MAX = 6
+KIND_LABEL = {"try": "Try", "adopt": "Adopt", "watch": "Watch", "read-later": "Read later"}
+def card_rank(c: dict) -> tuple:
+    """Flagged sources last (they tried to steer agents), then your 🔍 requests first, then
+    try/adopt before watch/read-later, surer and smaller steps first."""
+    from .cards import CONFIDENCE, EFFORTS, KINDS
+    return (bool(c.get("flagged")), not c.get("asked"), KINDS.index(c["kind"]), CONFIDENCE.index(c["confidence"]),
+            EFFORTS.index(c["effort"]))
+
+
+FLAG_NOTE = " ⚠️ The source contained text aimed at AI agents; the reader ignored it."
 from .state import write_json
 
 ID_COMMENT = re.compile(r"<!-- id:([0-9a-f]{10}) -->")
@@ -37,7 +50,7 @@ def _link_fields(c: dict) -> dict:
 
 
 def build_digest(picks: dict, candidates_doc: dict, report: dict | None = None,
-                 ranker: str = "claude") -> dict:
+                 ranker: str = "claude", cards: list[dict] | None = None) -> dict:
     errors = P.validate_picks(picks, candidates_doc)
     if errors:
         raise RenderError(errors)
@@ -56,6 +69,11 @@ def build_digest(picks: dict, candidates_doc: dict, report: dict | None = None,
             {"id": e["id"], **{f: e[f].strip() for f in fields[1:]}, **_link_fields(by_id[e["id"]])}
             for e in picks.get(section, [])
         ]
+    cards = cards or []
+    cerrs = validate_cards_structure(cards)
+    if cerrs:
+        raise RenderError(cerrs)
+    out["cards"] = sorted(cards, key=card_rank)[:CARDS_MAX]
     out["stats"] = {
         "candidates": len(by_id),
         "sources_ok": sum(1 for s in sources.values() if s.get("ok")),
@@ -71,8 +89,11 @@ def build_digest(picks: dict, candidates_doc: dict, report: dict | None = None,
 def validate_digest(d: dict) -> list[str]:
     """Structural check of a digest JSON on its own (used by the delivery Action)."""
     errs = []
-    if d.get("schema_version") != P.SCHEMA_VERSION:
-        errs.append(f"schema_version must be {P.SCHEMA_VERSION}")
+    if d.get("schema_version") not in (1, P.SCHEMA_VERSION):
+        errs.append(f"schema_version must be 1 or {P.SCHEMA_VERSION}")
+    errs += validate_cards_structure(d.get("cards", []))
+    if len(d.get("cards", [])) > CARDS_MAX:
+        errs.append(f"at most {CARDS_MAX} cards")
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", str(d.get("date", ""))):
         errs.append("date must be YYYY-MM-DD")
     errs += P.text_errors("digest", "opener", d.get("opener"))
@@ -131,6 +152,16 @@ def to_markdown(d: dict) -> str:
     for n, e in enumerate(d["top"], 1):
         L += [f"### {n}. {_esc(e['headline'])}", "", _esc(e["summary"]), "",
               f"**Why it matters to you:** {_esc(e['why'])}", "", _links(e), ""]
+    if d.get("cards"):
+        L += ["## 🧪 Worth trying", ""]
+        for c in d["cards"]:
+            asked = "🔍 " if c.get("asked") else ""
+            fits = ", ".join(c["fits"])
+            line = (f"- {asked}**{KIND_LABEL[c['kind']]} · {c['effort']}**: {_esc(c['next_step'])} "
+                    f"_{_esc(c['title'])}_ · fits {_esc(fits)} "
+                    f"([{_esc(c['source_name'] or 'Source')}]({_href(c['url'])}))")
+            L.append(line + (FLAG_NOTE if c.get("flagged") else ""))
+        L += [""]
     L += ["## 👀 Worth a skim", ""]
     L += [f"- {_esc(e['line'])} ({_links(e)})" for e in d["skim"]] or ["_Nothing else today._"]
     L += ["", "## 🔧 Changed in my tools", ""]
@@ -139,10 +170,12 @@ def to_markdown(d: dict) -> str:
     items = [(e.get("headline") or f"{e['source_name']}: {e['title']}", e["id"])
              for s in ("top", "skim", "tools") for e in d[s]]
     if items:
-        L += ["", "<details><summary>👍 / 👎 — tick any; a weekly run learns from them</summary>", ""]
+        L += ["", "<details><summary>👍 / 👎 / 🔍 — tick any. 🔍 means dig in: a reviewer reads it "
+              "in full tomorrow and says what's worth trying</summary>", ""]
         for label, iid in items:
             L.append(f"- [ ] 👍 {_label(label)} <!-- id:{iid} -->")
             L.append(f"- [ ] 👎 {_label(label)} <!-- id:{iid} -->")
+            L.append(f"- [ ] 🔍 {_label(label)} <!-- id:{iid} -->")
         L += ["", "</details>"]
     st = d["stats"]
     foot = f"{st['candidates']} new items from {st['sources_ok']}/{st['sources_total']} sources"

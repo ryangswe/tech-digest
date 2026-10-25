@@ -26,7 +26,8 @@ class DryRunTest(unittest.TestCase):
             md = md_path.read_text()
             self.assertEqual(md_path.name, "2026-10-23.md")
             self.assertEqual(re.findall(r"^## (.+)$", md, re.M),
-                             ["🏆 Top 3", "👀 Worth a skim", "🔧 Changed in my tools"])
+                             ["🏆 Top 3", "🧪 Worth trying", "👀 Worth a skim", "🔧 Changed in my tools"])
+            self.assertIn("ignored it.", md)  # the flagged fixture card carries the warning
             self.assertEqual(len(re.findall(r"^### \d\. ", md, re.M)), 3)
             # dedupe: the already-seen fixture items do not appear
             self.assertNotIn("fixture-old-post", md)

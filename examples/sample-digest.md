@@ -28,6 +28,12 @@ We show that the agent harness changes SWE-bench scores by up to 9 points. Fixtu
 
 [arXiv](https://arxiv.org/abs/2610.99001)
 
+## 🧪 Worth trying
+
+- **Try · 1h**: Write a five-line rubric for the reviewer's hand-off and try it on the next tech-digest review. _How we evaluate subagent hand-offs in Claude Code (fixture)_ · fits workflow kit, Claude Code workflow ([Anthropic Engineering](https://www.anthropic.com/engineering/fixture-subagent-evals))
+- **Adopt · 15m**: Check which CLAUDE.md sections in RiftSight are procedures that could move into a skill. _Notes on a fixture context-engineering pattern_ · fits workflow kit ([Simon Willison](https://simonwillison.net/2026/Oct/22/fixture-context/))
+- **Watch · half-day**: Wait for a stable release, then benchmark one detection model against the current wasm path. _transformers.js adds WebGPU vision pipelines (fixture)_ · fits riftsight-vision, DuelSight ([Hugging Face blog](https://huggingface.co/blog/fixture-webgpu)) ⚠️ The source contained text aimed at AI agents; the reader ignored it.
+
 ## 👀 Worth a skim
 
 - transformers.js adds WebGPU vision pipelines (fixture) ([Hugging Face blog](https://huggingface.co/blog/fixture-webgpu))
@@ -43,44 +49,60 @@ We show that the agent harness changes SWE-bench scores by up to 9 points. Fixtu
 
 ## 🔧 Changed in my tools
 
+- Claude Code releases Claude Code 9.9.1: Added a fixture-only flag to skills · Fixed subagent context compaction in long sessions ([Claude Code releases](https://github.com/anthropics/claude-code/releases/tag/v9.9.1))
 - Anthropic News Claude API pricing changes for batch and caching (fixture) ([Anthropic News](https://www.anthropic.com/news/claude-fixture-pricing))
-- Claude Code releases v9.9.1: What's changed Added a fixture-only flag to skills Fixed subagent context compaction in long sessions ([Claude Code releases](https://github.com/anthropics/claude-code/releases/tag/v9.9.1))
-- transformers.js releases 4.9.0: Adds a fixture ONNX quantisation option. ([transformers.js releases](https://github.com/huggingface/transformers.js/releases/tag/4.9.0))
+- transformers.js releases transformers.js 4.9.0: Version 4.9.0 of @⁠huggingface/transformers was published to npm. ([transformers.js releases](https://github.com/huggingface/transformers.js/releases/tag/4.9.0))
 
-<details><summary>👍 / 👎 — tick any; a weekly run learns from them</summary>
+<details><summary>👍 / 👎 / 🔍 — tick any. 🔍 means dig in: a reviewer reads it in full tomorrow and says what's worth trying</summary>
 
 - [ ] 👍 How we evaluate subagent hand-offs in Claude Code (fixture) <!-- id:93d4a2e11d -->
 - [ ] 👎 How we evaluate subagent hand-offs in Claude Code (fixture) <!-- id:93d4a2e11d -->
+- [ ] 🔍 How we evaluate subagent hand-offs in Claude Code (fixture) <!-- id:93d4a2e11d -->
 - [ ] 👍 Notes on a fixture context-engineering pattern <!-- id:f901b4bce8 -->
 - [ ] 👎 Notes on a fixture context-engineering pattern <!-- id:f901b4bce8 -->
+- [ ] 🔍 Notes on a fixture context-engineering pattern <!-- id:f901b4bce8 -->
 - [ ] 👍 Measuring Harness Effects on Coding Agent Benchmarks (fixture) <!-- id:db4354a095 -->
 - [ ] 👎 Measuring Harness Effects on Coding Agent Benchmarks (fixture) <!-- id:db4354a095 -->
+- [ ] 🔍 Measuring Harness Effects on Coding Agent Benchmarks (fixture) <!-- id:db4354a095 -->
 - [ ] 👍 Hugging Face blog: transformers.js adds WebGPU vision pipelines (fixture) <!-- id:006d2d7a2e -->
 - [ ] 👎 Hugging Face blog: transformers.js adds WebGPU vision pipelines (fixture) <!-- id:006d2d7a2e -->
+- [ ] 🔍 Hugging Face blog: transformers.js adds WebGPU vision pipelines (fixture) <!-- id:006d2d7a2e -->
 - [ ] 👍 Hacker News: A fixture database that runs in WebGPU <!-- id:b1f5a4bdc5 -->
 - [ ] 👎 Hacker News: A fixture database that runs in WebGPU <!-- id:b1f5a4bdc5 -->
+- [ ] 🔍 Hacker News: A fixture database that runs in WebGPU <!-- id:b1f5a4bdc5 -->
 - [ ] 👍 Hacker News: Running small vision models in the browser with ONNX (fixture) <!-- id:3c85b724dc -->
 - [ ] 👎 Hacker News: Running small vision models in the browser with ONNX (fixture) <!-- id:3c85b724dc -->
+- [ ] 🔍 Hacker News: Running small vision models in the browser with ONNX (fixture) <!-- id:3c85b724dc -->
 - [ ] 👍 Simon Willison: Quoting a fixture model card <!-- id:50d5fc0c55 -->
 - [ ] 👎 Simon Willison: Quoting a fixture model card <!-- id:50d5fc0c55 -->
+- [ ] 🔍 Simon Willison: Quoting a fixture model card <!-- id:50d5fc0c55 -->
 - [ ] 👍 Latent Space: Inside a coding-agent eval team (fixture) <!-- id:40b02ab6aa -->
 - [ ] 👎 Latent Space: Inside a coding-agent eval team (fixture) <!-- id:40b02ab6aa -->
+- [ ] 🔍 Latent Space: Inside a coding-agent eval team (fixture) <!-- id:40b02ab6aa -->
 - [ ] 👍 Chrome Web Store program policies: Chrome Web Store program policies changed <!-- id:0b96f39ad9 -->
 - [ ] 👎 Chrome Web Store program policies: Chrome Web Store program policies changed <!-- id:0b96f39ad9 -->
+- [ ] 🔍 Chrome Web Store program policies: Chrome Web Store program policies changed <!-- id:0b96f39ad9 -->
 - [ ] 👍 Riftbound news: Updates to our community tools guidelines for Riftbound (fixture). <!-- id:1d9cc30807 -->
 - [ ] 👎 Riftbound news: Updates to our community tools guidelines for Riftbound (fixture). <!-- id:1d9cc30807 -->
+- [ ] 🔍 Riftbound news: Updates to our community tools guidelines for Riftbound (fixture). <!-- id:1d9cc30807 -->
 - [ ] 👍 Show HN: Show HN: A fixture deck builder for card games, $2k MRR <!-- id:5adde044e4 -->
 - [ ] 👎 Show HN: Show HN: A fixture deck builder for card games, $2k MRR <!-- id:5adde044e4 -->
+- [ ] 🔍 Show HN: Show HN: A fixture deck builder for card games, $2k MRR <!-- id:5adde044e4 -->
 - [ ] 👍 Chrome for Developers: What's new in the side panel API (fixture) <!-- id:7ecc83afa0 -->
 - [ ] 👎 Chrome for Developers: What's new in the side panel API (fixture) <!-- id:7ecc83afa0 -->
+- [ ] 🔍 Chrome for Developers: What's new in the side panel API (fixture) <!-- id:7ecc83afa0 -->
 - [ ] 👍 Anthropic (YouTube): Building agents with skills (fixture talk) <!-- id:e4127ba1e4 -->
 - [ ] 👎 Anthropic (YouTube): Building agents with skills (fixture talk) <!-- id:e4127ba1e4 -->
+- [ ] 🔍 Anthropic (YouTube): Building agents with skills (fixture talk) <!-- id:e4127ba1e4 -->
+- [ ] 👍 Claude Code releases: Claude Code 9.9.1 <!-- id:c0301bb4be -->
+- [ ] 👎 Claude Code releases: Claude Code 9.9.1 <!-- id:c0301bb4be -->
+- [ ] 🔍 Claude Code releases: Claude Code 9.9.1 <!-- id:c0301bb4be -->
 - [ ] 👍 Anthropic News: Claude API pricing changes for batch and caching (fixture) <!-- id:c63d7adc1e -->
 - [ ] 👎 Anthropic News: Claude API pricing changes for batch and caching (fixture) <!-- id:c63d7adc1e -->
-- [ ] 👍 Claude Code releases: v9.9.1 <!-- id:6df6dca389 -->
-- [ ] 👎 Claude Code releases: v9.9.1 <!-- id:6df6dca389 -->
-- [ ] 👍 transformers.js releases: 4.9.0 <!-- id:9fe76bb8b9 -->
-- [ ] 👎 transformers.js releases: 4.9.0 <!-- id:9fe76bb8b9 -->
+- [ ] 🔍 Anthropic News: Claude API pricing changes for batch and caching (fixture) <!-- id:c63d7adc1e -->
+- [ ] 👍 transformers.js releases: transformers.js 4.9.0 <!-- id:bed7083306 -->
+- [ ] 👎 transformers.js releases: transformers.js 4.9.0 <!-- id:bed7083306 -->
+- [ ] 🔍 transformers.js releases: transformers.js 4.9.0 <!-- id:bed7083306 -->
 
 </details>
 

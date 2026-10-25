@@ -1,0 +1,12 @@
+{
+ "id": "f901b4bce8",
+ "kind": "adopt",
+ "effort": "15m",
+ "fits": [
+  "workflow kit"
+ ],
+ "confidence": "medium",
+ "what": "Simon describes keeping CLAUDE.md short and moving procedures into skills, with token counts (fixture).",
+ "why_you": "You already cap CLAUDE.md at 14 KB with the workflow check; this confirms the approach.",
+ "next_step": "Check which CLAUDE.md sections in RiftSight are procedures that could move into a skill."
+}

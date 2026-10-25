@@ -31,5 +31,6 @@ anything the code already shows.
 
 ## Architecture & delivery · `docs/decisions/architecture.md`
 
+- 2026-10-24 — Untrusted pages and bookmarks are read only by Read/Write-only subagents; code validates their cards before anything renders
 - 2026-10-23 — Claude writes picks JSON only; a deterministic renderer adds every link and enforces the format
 - 2026-10-23 — Delivery by a GitHub Action as github-actions[bot]; runs push claude/digest-* branches, never main
