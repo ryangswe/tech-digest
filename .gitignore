@@ -2,3 +2,6 @@ build/
 __pycache__/
 *.pyc
 .DS_Store
+# Bookmark backlog: raw post and page text and report drafts stay local (the repo is public)
+backlog/raw/
+backlog/out/

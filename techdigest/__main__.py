@@ -224,6 +224,59 @@ def cmd_weekly(args) -> int:
     return 0
 
 
+def cmd_backlog(args) -> int:
+    from . import backlog as B
+    root = Path(args.root)
+    try:
+        if args.step == "import":
+            if not args.path:
+                print("backlog import needs the archive path (zip or unzipped folder)", file=sys.stderr)
+                return 2
+            stats = B.import_archive(Path(args.path), root)
+            print(json.dumps(stats, indent=1))
+            return 3 if stats.get("warning") else 0
+        if args.step == "read":
+            from .net import http_get
+            from .read import read_many
+            cfg = load_config(args.config)
+            items = json.loads((root / "raw/items.json").read_text(encoding="utf-8"))
+            todo = [(i, it["url"]) for i, it in items.items() if it["url"] != it["post_url"]]
+            index = read_many(todo, root / "raw/reads", lambda u: http_get(u, cfg.user_agent, cfg.request_timeout),
+                              log=lambda *a: None)
+            print(json.dumps(dict(__import__("collections").Counter(e["status"] for e in index.values()))))
+            return 0
+        if args.step == "batches":
+            paths = B.make_batches(root, args.size)
+            print(f"{len(paths)} batch(es) of up to {args.size} -> {root}/raw/batches/")
+            return 0
+        if args.step == "validate":
+            report = B.validate_all(root, Path(args.profile))
+            bad = {k: v for k, v in report.items() if v}
+            print(f"{len(report) - len(bad)}/{len(report)} batch(es) valid")
+            for name, errs in bad.items():
+                print(f"{name}:", file=sys.stderr)
+                for e in errs[:20]:
+                    print(f"  - {e}", file=sys.stderr)
+            return 2 if bad else 0
+        if args.step == "report":
+            from .state import write_json
+            bad = {k: v for k, v in B.validate_all(root, Path(args.profile)).items() if v}
+            if bad:
+                print(f"refusing to report: {len(bad)} batch(es) not valid yet (run backlog validate)", file=sys.stderr)
+                return 2
+            md, queue = B.build_report(root)
+            out = root / "out"
+            out.mkdir(parents=True, exist_ok=True)
+            (out / "summary.md").write_text(md, encoding="utf-8")
+            write_json(out / "queue.json", queue)
+            print(f"wrote {out}/summary.md and {out}/queue.json ({len(queue)} cards queued)")
+            return 0
+    except B.BacklogError as e:
+        print(f"backlog: {e}", file=sys.stderr)
+        return 2
+    return 2
+
+
 def cmd_report_failure(args) -> int:
     from .deliver import report_failure
     body = Path(args.body_file).read_text(encoding="utf-8", errors="replace") if args.body_file else ""
@@ -320,6 +373,14 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("step", choices=["prepare", "publish"])
     s.add_argument("--date", required=True)
     s.set_defaults(func=cmd_weekly)
+
+    s = sub.add_parser("backlog", help="(local, one-off) import and triage the X bookmark backlog")
+    s.add_argument("step", choices=["import", "read", "batches", "validate", "report"])
+    s.add_argument("path", nargs="?", help="import: the X archive (.zip or unzipped folder)")
+    s.add_argument("--root", default="backlog")
+    s.add_argument("--size", type=int, default=40)
+    s.add_argument("--profile", default="profile.md")
+    s.set_defaults(func=cmd_backlog)
 
     s = sub.add_parser("report-failure", help="(Action) open a failure issue once per title")
     s.add_argument("--title", required=True)
