@@ -1,0 +1,152 @@
+{
+ "cards": [
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": false,
+   "id": "f0e7a1ae71",
+   "kind": "try",
+   "next_step": "Read the paper for the exact wording of the sentence, then add a similar sentence to your user-level instructions and watch whether agents stop following outdated conventions on your next few tasks.",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Stale Instruction Files Override the Code in Coding Agents: A One-Sentence Fix",
+   "url": "https://arxiv.org/abs/2610.30571",
+   "what": "A paper tested 40 Python projects where the instruction file asks for one convention and the code uses another. Without a fix, 90.1% of agent choices followed the stale file. One sentence in the user-level instruction file giving existing code precedence raised code-following from 4.2% to 91.4% and test pass rate from 89.4% to 100%.",
+   "why_you": "You rely on CLAUDE.md in every repo, including the workflow kit installed across your projects, so stale instructions are a real risk. A one-sentence user-level change is cheap, and the paper measured it on Claude Code."
+  },
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow"
+   ],
+   "flagged": false,
+   "id": "f9737df205",
+   "kind": "watch",
+   "next_step": "Leave it for now. If you want the benchmark-reproduction findings, watch the first part of the talk when you have spare time.",
+   "source": "yt-ai-engineer",
+   "source_name": "AI Engineer (YouTube)",
+   "title": "Why Frontier Models Fail as Buy-Side Analysts - Janie Gu, Google DeepMind & Suyeol Yun, LinqAlpha",
+   "url": "https://www.youtube.com/watch?v=aVbRSIQO2dE",
+   "what": "Per the feed summary of a conference talk, a Google DeepMind product manager who leads Kaggle Benchmarks argues many AI benchmarks are broken: they do not reflect real work, are costly to keep current, and have unverifiable scores. After reproducing 65 industry benchmarks, Kaggle found problems. The video was not read.",
+   "why_you": "It touches benchmark trustworthiness, which relates to your interest in agent evals. The buy-side analyst angle is far from your projects, and only the summary was available, so the fit is a stretch."
+  },
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow"
+   ],
+   "flagged": false,
+   "id": "3ee31c90d1",
+   "kind": "read-later",
+   "next_step": "Skim the abstract and method section to note the failure pattern, so you can check whether your own plan acceptance tests state every name they depend on.",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "What the Specification Did Not Say: Specification-Oracle Gaps in Test-Graded Coding-Agent Benchmarks",
+   "url": "https://arxiv.org/abs/2610.30635",
+   "what": "A paper defines a specification-oracle gap: benchmark tests that need names, paths or messages the task description never states. On SWE-Milestone, 25 of 98 milestones had such a test, and affected build units failed in 80.6% of runs versus 48.4%. The ranking held up, but scores shifted. The authors release an audit tool.",
+   "why_you": "You rely on review gates and evals of agent workflows. This shows how a test-graded benchmark can reward guessing upstream names, which is useful when judging benchmark claims. No project needs action now."
+  }
+ ],
+ "date": "2026-10-25",
+ "opener": "A quiet Sunday with no Claude Code releases, so the benchmarks and instruction files get the spotlight.",
+ "ranker": "claude",
+ "schema_version": 2,
+ "skim": [
+  {
+   "discussions": [],
+   "id": "5c3680f8a1",
+   "line": "SWE-VERIFIER: a paper on selectively verifying alternative actions so coding agents spend less compute and API cost on long interaction histories.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "SWE-VERIFIER: Selective Verification for Cost-Efficient Coding Agents",
+   "url": "https://arxiv.org/abs/2610.30284"
+  },
+  {
+   "discussions": [],
+   "id": "300031f1a8",
+   "line": "Kepler's talk on not letting models invent numbers: models cite figures, retrieval finds the source, deterministic code does the math, and a filter strips the rest.",
+   "link_name": "AI Engineer (YouTube)",
+   "source": "yt-ai-engineer",
+   "source_name": "AI Engineer (YouTube)",
+   "title": "Do Not Let Models Invent Numbers - Vinoo Ganesh, Kepler",
+   "url": "https://www.youtube.com/watch?v=dZgA6btnb_s"
+  },
+  {
+   "discussions": [],
+   "id": "30d5039f84",
+   "line": "Latent Space's AINews covers Kimi 3.1 Pro, open weights it describes as Fable-5.1-class, plus a Pro Highspeed API with 2-3x speed.",
+   "link_name": "Latent Space",
+   "source": "latent-space",
+   "source_name": "Latent Space",
+   "title": "[AINews] Kimi 3.1 Pro 104BA-2.8T: Fable-5.1-Class Open Weights narrows Closed-AI lead to 1 month... and Pro Highspeed API with 2-3× speed",
+   "url": "https://latent.space/p/ainews-kimi-31/"
+  }
+ ],
+ "stats": {
+  "baseline": [
+   "Claude Code releases",
+   "Riftbound news"
+  ],
+  "candidates": 37,
+  "failed": [
+   {
+    "error": "HTTP 429",
+    "id": "reddit",
+    "name": "Reddit"
+   }
+  ],
+  "quiet": [],
+  "sources_ok": 23,
+  "sources_total": 24
+ },
+ "title": "☕ Tech Digest — Sun 25 Oct 2026",
+ "tools": [],
+ "top": [
+  {
+   "discussions": [],
+   "headline": "Stale CLAUDE.md files can override what the code actually says",
+   "id": "f0e7a1ae71",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "summary": "A paper measures how coding agents follow a project's instruction file, such as CLAUDE.md or AGENTS.md, even when it disagrees with the existing code and even when the agent notices the disagreement. It then tests whether a single sentence added to the user's own instruction file makes agents follow the code instead.",
+   "title": "Stale Instruction Files Override the Code in Coding Agents: A One-Sentence Fix",
+   "url": "https://arxiv.org/abs/2610.30571",
+   "why": "What belongs in CLAUDE.md is on your list, and this is a measured look at what happens when the file goes out of date."
+  },
+  {
+   "discussions": [],
+   "headline": "Coding-agent benchmarks can demand details the task never states",
+   "id": "3ee31c90d1",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "summary": "The paper notes that coding-agent benchmarks describe a task in natural language but grade it with tests taken from the upstream project. Passing those tests can require information the description never states, such as a constant's name, a module path or an exact message. The authors call this a specification-oracle gap.",
+   "title": "What the Specification Did Not Say: Specification-Oracle Gaps in Test-Graded Coding-Agent Benchmarks",
+   "url": "https://arxiv.org/abs/2610.30635",
+   "why": "Results that question a benchmark are exactly what your evals interest asks for."
+  },
+  {
+   "discussions": [],
+   "headline": "Kaggle's benchmark lead on why most AI benchmarks are broken",
+   "id": "f9737df205",
+   "link_name": "AI Engineer (YouTube)",
+   "source": "yt-ai-engineer",
+   "source_name": "AI Engineer (YouTube)",
+   "summary": "Janie Gu of Google DeepMind, who leads Kaggle Benchmarks, explains why most AI benchmarks are broken: they don't reflect real work, they're expensive to keep current, and their scores can't be verified. The talk covers Kaggle's reproduction of 65 industry benchmarks.",
+   "title": "Why Frontier Models Fail as Buy-Side Analysts - Janie Gu, Google DeepMind & Suyeol Yun, LinqAlpha",
+   "url": "https://www.youtube.com/watch?v=aVbRSIQO2dE",
+   "why": "Another view on how to trust agent evaluations, which sits under your evals-for-coding-agents interest."
+  }
+ ]
+}
