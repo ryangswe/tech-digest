@@ -48,8 +48,9 @@ def cmd_render(args) -> int:
     except json.JSONDecodeError as e:
         print(f"{args.picks}: invalid JSON at line {e.lineno}: {e.msg}", file=sys.stderr)
         return 2
+    cards = load_json(Path(args.cards)) if Path(args.cards).exists() else []
     try:
-        digest = build_digest(picks, cands, report, ranker=args.ranker)
+        digest = build_digest(picks, cands, report, ranker=args.ranker, cards=cards)
     except RenderError as e:
         print(f"{args.picks} was refused ({len(e.errors)} problem(s)):", file=sys.stderr)
         for err in e.errors:
@@ -59,6 +60,71 @@ def cmd_render(args) -> int:
     j, m = write_digest(digest, Path(args.out))
     print(f"wrote {m} and {j}")
     return 0
+
+
+def _item_fields(c: dict) -> dict:
+    return {k: c.get(k, "") for k in ("title", "url", "source", "source_name", "link_name", "summary")}
+
+
+def cmd_read(args) -> int:
+    from .net import http_get
+    from .read import read_many
+    items: dict[str, dict] = {}
+    if args.ids:
+        cands = {c["id"]: c for c in json.loads(Path(args.candidates).read_text(encoding="utf-8"))["candidates"]}
+        ids = [i for i in args.ids.split(",") if i]
+        missing = [i for i in ids if i not in cands]
+        if missing:
+            print(f"unknown candidate id(s): {', '.join(missing)}", file=sys.stderr)
+            return 2
+        items.update({i: _item_fields(cands[i]) for i in ids})
+    if args.items:  # e.g. build/dig.json from dig-requests: [{id, url, title, ...}]
+        for it in json.loads(Path(args.items).read_text(encoding="utf-8")):
+            items[it["id"]] = {**_item_fields(it), "asked": True}
+    if not items:
+        print("nothing to read: pass --ids and/or --items", file=sys.stderr)
+        return 2
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    old = json.loads((out / "items.json").read_text()) if (out / "items.json").exists() else {}
+    (out / "items.json").write_text(json.dumps({**old, **items}, indent=1, ensure_ascii=False) + "\n",
+                                    encoding="utf-8")
+    if args.fixtures:
+        urlmap = json.loads((Path(args.fixtures) / "urls.json").read_text())
+
+        def getter(url):
+            if url not in urlmap:
+                raise RuntimeError("no fixture")
+            return (Path(args.fixtures) / urlmap[url]).read_bytes()
+    else:
+        cfg = load_config(args.config)
+
+        def getter(url):
+            return http_get(url, cfg.user_agent, cfg.request_timeout)
+    index = read_many([(i, it["url"]) for i, it in items.items()], out, getter)
+    ok = sum(1 for i in items if index[i]["status"] == "ok")
+    print(f"read {ok}/{len(items)} ok -> {out}/index.json (statuses only; the page texts are for "
+          "the reader subagent, not for you)")
+    return 0
+
+
+def cmd_cards(args) -> int:
+    from .cards import load_projects, validate_dir
+    from .state import write_json
+    items = json.loads((Path(args.reads) / "items.json").read_text(encoding="utf-8"))
+    valid, errors = validate_dir(Path(args.cards_dir), items, load_projects(Path(args.profile)))
+    for c in valid:
+        c["asked"] = bool(items[c["id"]].get("asked"))
+    write_json(Path(args.out), valid)
+    missing = sorted(set(items) - {c["id"] for c in valid} - set(errors))
+    print(f"{len(valid)} valid card(s) -> {args.out}")
+    if missing:
+        print(f"no card written for: {', '.join(missing)}")
+    for cid, errs in errors.items():
+        print(f"{cid}: refused", file=sys.stderr)
+        for e in errs:
+            print(f"  - {e}", file=sys.stderr)
+    return 2 if errors else 0
 
 
 def cmd_mark_seen(args) -> int:
@@ -132,6 +198,32 @@ def cmd_deliver(args) -> int:
     return 0
 
 
+def cmd_dig_requests(args) -> int:
+    """Read 🔍 ticks from the open digest issue with `gh api` (authenticated by the cloud proxy)."""
+    import subprocess
+    from .deliver import DIGEST_LABEL, dig_requests
+    from .state import write_json
+    repo = args.repo or json.loads(Path(args.config).read_text()).get("repository", "")
+    r = subprocess.run(["gh", "api", f"repos/{repo}/issues?labels={DIGEST_LABEL}&state=open&per_page=20"],
+                       capture_output=True, text=True)
+    if r.returncode:
+        print(f"gh api failed ({r.stderr.strip()[:200]}); no 🔍 requests today", file=sys.stderr)
+        write_json(Path(args.out), [])
+        return 0
+    issues = [i for i in json.loads(r.stdout) if "pull_request" not in i]
+    reqs = dig_requests(issues, Path("."))
+    write_json(Path(args.out), reqs)
+    print(f"{len(reqs)} 🔍 request(s) -> {args.out}")
+    return 0
+
+
+def cmd_weekly(args) -> int:
+    from . import weekly
+    fn = weekly.prepare if args.step == "prepare" else weekly.publish
+    print(json.dumps(fn(_gh(), Path("."), args.date)))
+    return 0
+
+
 def cmd_report_failure(args) -> int:
     from .deliver import report_failure
     body = Path(args.body_file).read_text(encoding="utf-8", errors="replace") if args.body_file else ""
@@ -163,7 +255,23 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--report", default="build/fetch-report.json")
     s.add_argument("--out", default="digest")
     s.add_argument("--ranker", default="claude", choices=["claude", "keywords"])
+    s.add_argument("--cards", default="build/cards.json", help="validated cards (optional)")
     s.set_defaults(func=cmd_render)
+
+    s = sub.add_parser("read", help="fetch full text of candidates into build/reads/ (for the reader subagent)")
+    s.add_argument("--ids", help="comma-separated candidate ids")
+    s.add_argument("--items", help="JSON list of {id, url, title, ...} (from dig-requests)")
+    s.add_argument("--candidates", default="build/candidates.json")
+    s.add_argument("--out", default="build/reads")
+    s.add_argument("--fixtures", help="read pages from DIR/urls.json instead of the network")
+    s.set_defaults(func=cmd_read)
+
+    s = sub.add_parser("cards", help="validate the reader's build/cards/*.json into build/cards.json")
+    s.add_argument("--reads", default="build/reads")
+    s.add_argument("--cards-dir", default="build/cards")
+    s.add_argument("--profile", default="profile.md")
+    s.add_argument("--out", default="build/cards.json")
+    s.set_defaults(func=cmd_cards)
 
     s = sub.add_parser("mark-seen", help="add every candidate to state/seen.json and prune")
     s.add_argument("--state", default="state")
@@ -202,6 +310,16 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("step", choices=["harvest", "publish"])
     s.add_argument("--date", required=True)
     s.set_defaults(func=cmd_deliver)
+
+    s = sub.add_parser("dig-requests", help="items you ticked 🔍 on the open digest issue -> build/dig.json")
+    s.add_argument("--repo", help="owner/name (default: sources.json `repository`)")
+    s.add_argument("--out", default="build/dig.json")
+    s.set_defaults(func=cmd_dig_requests)
+
+    s = sub.add_parser("weekly", help="(Action, Mondays) build or publish the weekly Try-this issue")
+    s.add_argument("step", choices=["prepare", "publish"])
+    s.add_argument("--date", required=True)
+    s.set_defaults(func=cmd_weekly)
 
     s = sub.add_parser("report-failure", help="(Action) open a failure issue once per title")
     s.add_argument("--title", required=True)

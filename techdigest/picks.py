@@ -19,7 +19,7 @@ import re
 
 from .text import word_count
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2  # 2 added "cards"; 1 is still readable
 TOP_N, SKIM_MAX, TOOLS_MAX = 3, 10, 6
 WORDS = {"opener": 40, "headline": 14, "summary": 80, "why": 50, "line": 40}
 TOTAL_WORDS = 1100  # about 5 minutes of reading

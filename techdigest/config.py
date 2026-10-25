@@ -72,7 +72,7 @@ def parse_config(data: dict) -> Config:
     raw_sources = data.get("sources")
     if not isinstance(raw_sources, list) or not raw_sources:
         _fail("sources", "must be a non-empty list")
-    known = set(Source.__dataclass_fields__)
+    known = set(Source.__dataclass_fields__)  # top-level keys such as "repository" are free-form
     sources: list[Source] = []
     seen_ids: set[str] = set()
     for i, raw in enumerate(raw_sources):

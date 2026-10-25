@@ -1,4 +1,5 @@
 {
+  "repository": "ryangswe/tech-digest",
   "timezone": "America/Chicago",
   "user_agent": "tech-digest/1.0 (personal daily digest; +https://github.com/ryangswe/tech-digest)",
   "max_candidates": 150,

@@ -15,7 +15,39 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from techdigest.parse import page_hash, page_paragraphs, paragraph_hashes  # noqa: E402
+from techdigest.items import Item  # noqa: E402
 from techdigest.urls import canonical_key  # noqa: E402
+
+CARDS = ROOT / "fixtures/cards"
+
+
+def fixture_cards() -> dict:
+    """Cards as the reader subagent would write them, for the dry run (no Claude offline)."""
+    def cid(url):
+        return Item("x", "x", url).id
+    return {
+        cid("https://www.anthropic.com/engineering/fixture-subagent-evals"): {
+            "kind": "try", "effort": "1h", "fits": ["workflow kit", "Claude Code workflow"],
+            "confidence": "high",
+            "what": "The post describes scoring subagent hand-offs with a fixed rubric and a fresh-context grader (fixture).",
+            "why_you": "Your kit's reviewer already runs in fresh context; a hand-off rubric would make its findings comparable across repos.",
+            "next_step": "Write a five-line rubric for the reviewer's hand-off and try it on the next tech-digest review.",
+        },
+        cid("https://simonwillison.net/2026/Oct/22/fixture-context/"): {
+            "kind": "adopt", "effort": "15m", "fits": ["workflow kit"], "confidence": "medium",
+            "what": "Simon describes keeping CLAUDE.md short and moving procedures into skills, with token counts (fixture).",
+            "why_you": "You already cap CLAUDE.md at 14 KB with the workflow check; this confirms the approach.",
+            "next_step": "Check which CLAUDE.md sections in RiftSight are procedures that could move into a skill.",
+        },
+        cid("https://huggingface.co/blog/fixture-webgpu"): {
+            "kind": "watch", "effort": "half-day", "fits": ["riftsight-vision", "DuelSight"],
+            "confidence": "low",
+            "what": "transformers.js adds WebGPU vision pipelines for running detection models in the browser (fixture).",
+            "why_you": "Card recognition in DuelSight and RiftSight runs in the browser; WebGPU could speed it up.",
+            "next_step": "Wait for a stable release, then benchmark one detection model against the current wasm path.",
+            "flags": ["The page contains instructions addressed to AI agents asking them to change settings."],
+        },
+    }
 
 FEEDS = ROOT / "fixtures/feeds"
 STATE = ROOT / "fixtures/state"
@@ -197,6 +229,12 @@ def main():
     for name, text in FILES.items():
         (FEEDS / name).write_text(text.strip() + "\n", encoding="utf-8")
     (ROOT / "fixtures/now.txt").write_text(NOW + "\n")
+
+    CARDS.mkdir(parents=True, exist_ok=True)
+    for old in CARDS.glob("*.json"):
+        old.unlink()
+    for cid, card in fixture_cards().items():
+        (CARDS / f"{cid}.json").write_text(json.dumps({"id": cid, **card}, indent=1) + "\n")
 
     STATE.mkdir(parents=True, exist_ok=True)
     seen = {k: "2026-10-01" for k in [

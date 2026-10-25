@@ -1,0 +1,14 @@
+<!doctype html><html><head><title>Ignored title</title>
+<meta property="og:title" content="Splitting a reviewer into a fresh-context subagent (fixture)"></head>
+<body><header><nav><a href="/">Home</a> <a href="/about">About</a></nav></header>
+<div class="layout"><aside class="sidebar"><p>Subscribe to the newsletter for more posts like this one, every week, free.</p></aside>
+<article><h1>Splitting a reviewer into a fresh-context subagent</h1>
+<p>We moved code review out of the main agent session into a subagent that starts with no conversation history. It reads only the task, the plan and the diff.</p>
+<p>Over four weeks the fresh reviewer flagged 31 issues the in-session review had missed, mostly missing failure handling and tests that mirrored the implementation.</p>
+<h2>What we changed</h2>
+<p>The reviewer gets read-only tools and a fixed output format with severities. The main session must fix material findings and re-run the checks before calling work done.</p>
+<pre>reviewer: tools: Read, Grep, Bash (read-only)</pre>
+<p>The cost was about 15% more tokens per task, which the team judged worth it. Fixture text for tests.</p>
+</article>
+<section class="comments"><h3>Comments</h3><p>Great post! Check out my SEO agency for cheap backlinks and more traffic.</p></section></div>
+<footer><p>Copyright 2026 Example Blog. All rights reserved. Privacy policy and terms.</p></footer></body></html>

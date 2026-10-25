@@ -10,7 +10,13 @@ from pathlib import Path
 
 TICK_RE = re.compile(r"^\s*[-*] \[[xX]\] (👍|👎)\s.*?<!-- id:([0-9a-f]{10}) -->", re.M)
 WEEKLY_MIN_GAP_DAYS = 6
-SIGNALS = {"vote", "reaction", "comment"}
+SIGNALS = {"vote", "reaction", "comment", "dig", "tried", "later", "not_for_me"}
+DIG_RE = re.compile(r"^\s*[-*] \[[xX]\] 🔍\s.*?<!-- id:([0-9a-f]{10}) -->", re.M)
+
+
+def parse_digs(body: str) -> list[str]:
+    """Item ids ticked 🔍 (dig in), in order, without repeats."""
+    return list(dict.fromkeys(DIG_RE.findall(body or "")))
 
 
 def parse_ticks(body: str) -> list[tuple[int, str]]:
@@ -63,6 +69,11 @@ def summary(lines: list[dict], today: str, days: int = 30) -> str:
     if reactions:
         out += ["", "Whole-digest reactions: " + ", ".join(
             f"{ln['digest']} {'👍' if ln['vote'] > 0 else '👎'}" for ln in reactions[-14:])]
+    for kind, head in (("dig", "Asked to dig into (🔍)"), ("tried", "Tried (✅ done)"),
+                       ("not_for_me", "Not for me (🙅)")):
+        picked = [ln for ln in recent if ln["kind"] == kind]
+        if picked:
+            out += ["", f"{head}:"] + [f"- {ln.get('title') or ln['id']} ({ln['digest']})" for ln in picked[-20:]]
     comments = [ln for ln in recent if ln["kind"] == "comment"]
     if comments:
         out += ["", "Comments (the owner's own words):"]

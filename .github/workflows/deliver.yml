@@ -65,6 +65,22 @@ jobs:
           done
       - name: Open today's issue and close the previous one
         run: python3 -m techdigest deliver publish --date "$DAY" 2>&1 | tee -a run.log
+      - name: Weekly Try-this issue (Mondays)
+        run: |
+          python3 -m techdigest weekly prepare --date "$DAY" 2>&1 | tee -a run.log
+          WEEK=$(python3 -c "import datetime, techdigest.weekly as w; print(w.week_id(datetime.date.fromisoformat('$DAY')))")
+          for p in "reviews/$WEEK.json" "reviews/$WEEK.md" backlog/queue.json state/feedback.jsonl; do
+            if [ -e "$p" ]; then git add -- "$p"; fi
+          done
+          if ! git diff --cached --quiet; then
+            git commit -q -m "try-this: $WEEK"
+            for attempt in 1 2 3; do
+              if git push -q origin HEAD:main 2>&1 | tee -a run.log; then break; fi
+              [ "$attempt" = 3 ] && exit 1
+              git pull -q --rebase origin main 2>&1 | tee -a run.log
+            done
+          fi
+          python3 -m techdigest weekly publish --date "$DAY" 2>&1 | tee -a run.log
       - name: Delete the branch
         run: git push -q origin --delete "$BRANCH"
       - name: Report the failure as an issue

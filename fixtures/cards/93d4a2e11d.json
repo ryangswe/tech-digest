@@ -1,0 +1,13 @@
+{
+ "id": "93d4a2e11d",
+ "kind": "try",
+ "effort": "1h",
+ "fits": [
+  "workflow kit",
+  "Claude Code workflow"
+ ],
+ "confidence": "high",
+ "what": "The post describes scoring subagent hand-offs with a fixed rubric and a fresh-context grader (fixture).",
+ "why_you": "Your kit's reviewer already runs in fresh context; a hand-off rubric would make its findings comparable across repos.",
+ "next_step": "Write a five-line rubric for the reviewer's hand-off and try it on the next tech-digest review."
+}

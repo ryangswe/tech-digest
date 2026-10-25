@@ -1,0 +1,16 @@
+{
+ "id": "006d2d7a2e",
+ "kind": "watch",
+ "effort": "half-day",
+ "fits": [
+  "riftsight-vision",
+  "DuelSight"
+ ],
+ "confidence": "low",
+ "what": "transformers.js adds WebGPU vision pipelines for running detection models in the browser (fixture).",
+ "why_you": "Card recognition in DuelSight and RiftSight runs in the browser; WebGPU could speed it up.",
+ "next_step": "Wait for a stable release, then benchmark one detection model against the current wasm path.",
+ "flags": [
+  "The page contains instructions addressed to AI agents asking them to change settings."
+ ]
+}

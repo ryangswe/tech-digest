@@ -11,7 +11,7 @@ import json
 import re
 from pathlib import Path
 
-from .feedback import append_lines, load_lines, parse_ticks
+from .feedback import append_lines, load_lines, parse_digs, parse_ticks
 from .render import digest_title
 
 DIGEST_LABEL = "digest"
@@ -48,6 +48,10 @@ def harvest(gh, repo_root: Path, owner: str, today: str) -> list[dict]:
             e = items.get(iid, {})
             lines.append({**base, "kind": "vote", "vote": vote, "id": iid,
                           "title": e.get("headline") or e.get("title", ""), "source": e.get("source", "")})
+        for iid in parse_digs(issue.get("body") or ""):
+            e = items.get(iid, {})
+            lines.append({**base, "kind": "dig", "id": iid,
+                          "title": e.get("headline") or e.get("title", ""), "source": e.get("source", "")})
         for r in gh.issue_reactions(issue["number"]):
             if r.get("user", {}).get("login") == owner and r.get("content") in ("+1", "-1"):
                 lines.append({**base, "kind": "reaction", "vote": 1 if r["content"] == "+1" else -1})
@@ -57,6 +61,22 @@ def harvest(gh, repo_root: Path, owner: str, today: str) -> list[dict]:
         lines.append({**base, "kind": "harvested"})  # marks the issue done even with no signals
     append_lines(path, lines)
     return lines
+
+
+def dig_requests(issues: list[dict], repo_root: Path) -> list[dict]:
+    """Items ticked 🔍 on open digest issues, as read items: [{id, url, title, ...}]."""
+    out = []
+    for issue in issues:
+        day = issue_day(issue)
+        items = _lookup(Path(repo_root), day) if day else {}
+        for iid in parse_digs(issue.get("body") or ""):
+            e = items.get(iid)
+            if e:
+                out.append({"id": iid, "url": e["url"], "title": e.get("title", ""),
+                            "source": e.get("source", ""), "source_name": e.get("source_name", ""),
+                            "link_name": e.get("link_name", ""), "summary": e.get("summary", ""),
+                            "digest": day})
+    return out
 
 
 def _interests_note(gh) -> str:
