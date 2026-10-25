@@ -1,7 +1,8 @@
 """Deterministic full-text reading: item URL -> build/reads/<id>.md, marked untrusted.
 
 Only the quarantined `reader` / `triage` subagents (tools: Read, Write) open these files. The
-main session runs this command and reads `build/reads/index.json`, never the text itself.
+main session runs this command and sees only ids, statuses and character counts: no titles,
+no page text and no server-supplied error text reach it (`index.json` holds the same).
 """
 
 from __future__ import annotations
@@ -51,8 +52,19 @@ class Result:
     text: str = ""
 
     def index_entry(self) -> dict:
-        return {"url": self.url, "status": self.status, "reason": self.reason,
-                "title": self.title, "chars": len(self.text)}
+        return {"status": self.status, "reason": safe_reason(self), "chars": len(self.text)}
+
+
+def safe_reason(r: "Result") -> str:
+    """A reason built by this code only: skip reasons are ours; failures reduce to a category."""
+    if r.status in ("skipped", "thin"):
+        return r.reason
+    m = re.match(r"^HTTP (\d{3})", r.reason or "")
+    if m:
+        return f"HTTP {m.group(1)}"
+    if r.reason in ("page over 5 MB", "not an http(s) link"):
+        return r.reason
+    return "network or parse error" if r.status == "failed" else ""
 
 
 # --- Article extraction ---------------------------------------------------------------------
@@ -180,9 +192,12 @@ def plan_fetch(url: str) -> tuple[str, str]:
     if path.lower().endswith(".pdf"):
         return "skip", "PDF; not extracted"
     if host == "github.com":
-        if len(segs) == 2 or (len(segs) >= 4 and segs[2] == "tree"):
-            ref = segs[3] if len(segs) >= 4 else "HEAD"
-            return "markdown", f"https://raw.githubusercontent.com/{segs[0]}/{segs[1]}/{ref}/README.md"
+        if len(segs) == 2:
+            return "markdown", f"https://raw.githubusercontent.com/{segs[0]}/{segs[1]}/HEAD/README.md"
+        if len(segs) >= 4 and segs[2] == "tree":  # assumes a one-segment ref, the common case
+            sub = "/".join(segs[4:])
+            return "markdown", (f"https://raw.githubusercontent.com/{segs[0]}/{segs[1]}/{segs[3]}/"
+                                f"{sub + '/' if sub else ''}README.md")
         if len(segs) >= 5 and segs[2] == "blob" and segs[-1].lower().endswith((".md", ".txt")):
             return "markdown", f"https://raw.githubusercontent.com/{segs[0]}/{segs[1]}/{'/'.join(segs[3:])}"
         return "skip", "github.com pages other than repos and Markdown files can't be read from cloud sessions"
@@ -194,6 +209,8 @@ def plan_fetch(url: str) -> tuple[str, str]:
 
 
 def read_url(item_id: str, url: str, getter, now: datetime | None = None) -> Result:
+    if not re.match(r"^https?://", url or "", re.I):
+        return Result(item_id, url, "failed", "not an http(s) link")
     how, target = plan_fetch(url)
     if how == "skip":
         return Result(item_id, url, "skipped", target)
@@ -222,8 +239,14 @@ def read_url(item_id: str, url: str, getter, now: datetime | None = None) -> Res
     return Result(item_id, url, "ok", "", title, text)
 
 
+def _neutralise(text: str) -> str:
+    """A page must not be able to fake the end of its own untrusted block."""
+    return re.sub(r"UNTRUSTED[\s_-]*CONTENT", "untrusted-content", text or "", flags=re.I)
+
+
 def write_result(r: Result, out_dir: Path, now: datetime) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
+    r.title, r.text = _neutralise(r.title)[:300], _neutralise(r.text)
     lines = [HEADER, "", f"# {r.title or '(untitled)'}", "", f"- Source: {r.url}",
              f"- Fetched: {iso(now)}", f"- Status: {r.status}" + (f" ({r.reason})" if r.reason else ""),
              "", "---", "", r.text or "(no text)", "", HEADER, ""]
@@ -249,7 +272,7 @@ def read_many(items: list[tuple[str, str]], out_dir: Path, getter, now: datetime
         last_hit[host] = time.monotonic()
         write_result(r, out_dir, now)
         index[item_id] = r.index_entry()
-        log(f"{item_id} {r.status:7} {len(r.text):6} {r.reason or url[:70]}")
+        log(f"{item_id} {r.status:7} {len(r.text):6} {safe_reason(r)}")
     out_dir.mkdir(parents=True, exist_ok=True)
     index_path.write_text(json.dumps(index, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     return index

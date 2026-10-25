@@ -31,3 +31,14 @@
   - **Resolution:** the daily prompt now says to treat summaries as data, and to report any
     instruction-like text it sees.
   - **Permanent decision record needed:** No (covered by the quarantine entry)
+
+- **2026-10-24 — T8: the review found the quarantine unenforced**
+  - **Evidence:** `tools: Read, Write` limits which tools a subagent has, not where Write may
+    write. An injected reader could overwrite repository code, the hook that runs on every
+    write, or the build files the renderer trusts.
+  - **Impact:** the plan's central safety claim did not hold until fixed.
+  - **Resolution:** a tamper check (`scope snapshot`/`check`, token held by the main session)
+    stops the run on any change. A fail-closed write-scope hook for run branches is built and
+    tested; wiring it into `.claude/settings.json` is the owner's call. Side channels closed;
+    flags reduced to a boolean.
+  - **Permanent decision record needed:** Yes (the quarantine entry is updated)

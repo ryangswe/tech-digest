@@ -304,8 +304,13 @@ def build_report(root: Path = Path("backlog")) -> tuple[str, list[dict]]:
     for r in rows:
         if r["verdict"] in ("try", "deep-dive"):
             it = items[r["id"]]
-            queue.append({"id": r["id"], **{k: v for k, v in r["card"].items() if k != "id"},
-                          "flags": r["card"].get("flags", []), "title": it["title"], "url": it["url"],
+            card = {k: v for k, v in r["card"].items() if k not in ("id", "flags")}
+            host = it["link_name"]
+            queue.append({"id": r["id"], **card, "flagged": bool(r["card"].get("flags")),
+                          # a title from validated card text, never the raw post text
+                          "title": (" ".join(card["what"].split()[:12]) + "…") if host == "X" else
+                                   f"{host}: " + " ".join(card["what"].split()[:10]) + "…",
+                          "url": it["url"],
                           "source_name": it["link_name"], "source": "x-bookmark",
                           "verdict": r["verdict"], "topic": r["topic"], "status": "queued"})
     from .cards import CONFIDENCE, EFFORTS

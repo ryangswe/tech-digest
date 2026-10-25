@@ -13,7 +13,7 @@ MONDAY = "2026-10-26"  # ISO week 2026-W44
 def card(i, kind="try", effort="1h", confidence="high", **kw):
     return {"id": f"{i:010x}", "kind": kind, "effort": effort, "confidence": confidence,
             "fits": ["workflow kit"], "what": f"What {i}.", "why_you": f"Why {i}.",
-            "next_step": f"Step {i}.", "flags": [], "title": f"Card {i}",
+            "next_step": f"Step {i}.", "flagged": False, "title": f"Card {i}",
             "url": f"https://example.com/{i}", "source_name": "News", "source": "news", **kw}
 
 
@@ -82,6 +82,26 @@ class BuildTest(unittest.TestCase):
         self.assertIsNone(w2)  # "later" from W43 does not come back a second time
 
 
+    def test_bad_queue_entries_are_skipped_not_fatal(self):
+        with TempDir() as repo:
+            write_digest_cards(repo, "2026-10-21", [card(1)])
+            (repo / "backlog").mkdir()
+            (repo / "backlog/queue.json").write_text(json.dumps(
+                [{"id": "nope"}, {**card(7), "kind": "???"}, "junk", {**card(8), "status": "queued"}]))
+            w = weekly.build(repo, MONDAY)
+        self.assertEqual([c["id"] for c in w["cards"]], [card(1)["id"], card(8)["id"]])
+
+    def test_later_card_carded_again_still_comes_back(self):
+        with TempDir() as repo:
+            (repo / "reviews").mkdir()
+            (repo / "reviews/2026-W43.json").write_text(json.dumps({"cards": [card(1)]}))
+            append_lines(repo / "state/feedback.jsonl", [
+                {"digest": "2026-W43", "kind": "later", "id": card(1)["id"], "harvested": MONDAY}])
+            write_digest_cards(repo, "2026-10-22", [card(1)])  # it showed up in a digest again
+            w = weekly.build(repo, MONDAY)
+        self.assertEqual([(c["id"], c["from"]) for c in w["cards"]], [(card(1)["id"], "you said later")])
+
+
 class IssueTest(unittest.TestCase):
     def test_prepare_publish_harvest_cycle(self):
         gh = FakeGitHub()
@@ -108,6 +128,8 @@ class IssueTest(unittest.TestCase):
             weekly.prepare(gh, repo, "2026-11-02")
             kinds = [(ln["kind"], ln.get("id")) for ln in load_lines(repo / "state/feedback.jsonl")]
             self.assertIn(("not_for_me", cid), kinds)
+            nfm = next(ln for ln in load_lines(repo / "state/feedback.jsonl") if ln["kind"] == "not_for_me")
+            self.assertEqual(nfm["title"], "Card 1")
             nxt = json.loads((repo / "reviews/2026-W45.json").read_text())
             self.assertEqual([c["id"] for c in nxt["cards"]], [card(5)["id"]])
             self.assertEqual(weekly.publish(gh, repo, "2026-11-02"), {"created": 2, "closed": [1]})

@@ -13,7 +13,7 @@ import re
 from datetime import date, timedelta
 from pathlib import Path
 
-from .cards import CONFIDENCE, EFFORTS, KINDS
+from .cards import CONFIDENCE, EFFORTS, KINDS, validate_cards_structure
 from .feedback import append_lines, load_lines
 from .render import KIND_LABEL, _esc, _href
 from .state import write_json
@@ -50,7 +50,7 @@ def _week_cards(repo: Path, monday: date) -> list[dict]:
 
 
 def _score(c: dict, votes: dict[str, int], asked: set[str]) -> tuple:
-    return (bool(c.get("flags")), -(votes.get(c["id"], 0) + (2 if c["id"] in asked or c.get("asked") else 0)),
+    return (bool(c.get("flagged")), -(votes.get(c["id"], 0) + (2 if c["id"] in asked or c.get("asked") else 0)),
             KINDS.index(c["kind"]), CONFIDENCE.index(c["confidence"]), EFFORTS.index(c["effort"]))
 
 
@@ -73,16 +73,23 @@ def build(repo: Path, today: str) -> dict | None:
     later = {cid for cid, wk in ticked_week.items()
              if not any(stem > wk and any(c["id"] == cid for c in cards) for stem, cards in reviews.items())}
 
-    pool = [c for c in _week_cards(repo, monday) if c["id"] not in closed and votes.get(c["id"], 0) >= 0]
+    pool = [c for c in _week_cards(repo, monday) if c["id"] not in closed and votes.get(c["id"], 0) >= 0
+            and not validate_cards_structure([c])]
+    in_pool = {c["id"]: c for c in pool}
     for stem in sorted(reviews):  # "later" cards come back once
         for c in reviews[stem]:
-            if c["id"] in later and c["id"] not in closed and c["id"] not in {x["id"] for x in pool}:
-                pool.append({**c, "from": "you said later"})
+            if c["id"] in later and c["id"] not in closed:
+                if c["id"] in in_pool:
+                    in_pool[c["id"]]["from"] = "you said later"
+                else:
+                    pool.append({**c, "from": "you said later"})
+                    in_pool[c["id"]] = pool[-1]
     pool = [c for c in pool if c["id"] not in shown_before or c.get("from") == "you said later"]
     pool.sort(key=lambda c: _score(c, votes, asked))
 
     queue_path = repo / "backlog/queue.json"
     queue = json.loads(queue_path.read_text()) if queue_path.exists() else []
+    queue = [q for q in queue if isinstance(q, dict) and not validate_cards_structure([q])]  # skip bad entries
     waiting = [q for q in queue if q.get("status", "queued") == "queued" and q["id"] not in closed]
     from_backlog = waiting[:FROM_BACKLOG]
     picked = pool[: TOTAL - len(from_backlog)]  # the week fills whatever the backlog leaves
@@ -100,7 +107,7 @@ def to_markdown(w: dict) -> str:
          f"_{len(w['cards'])} things worth a look, ranked by what you've liked and how small the "
          "first step is. Tick one box per card; the weekly interests review learns from them._", ""]
     for n, c in enumerate(w["cards"], 1):
-        flag = " ⚠️ The source contained text aimed at AI agents; the reader ignored it." if c.get("flags") else ""
+        flag = " ⚠️ The source contained text aimed at AI agents; the reader ignored it." if c.get("flagged") else ""
         L += [f"### {n}. {_esc(c['title'])}", "",
               f"**{KIND_LABEL[c['kind']]} · {c['effort']}** · fits {_esc(', '.join(c['fits']))} · "
               f"from {_esc(c.get('from', ''))} · [{_esc(c.get('source_name') or 'Source')}]({_href(c['url'])}){flag}", "",
@@ -124,9 +131,11 @@ def harvest(gh, repo: Path, today: str) -> list[dict]:
         m = MARKER_RE.search(issue.get("body") or "")
         if not m or m.group(1) >= this_week or issue["number"] in done:
             continue
+        rp = Path(repo) / f"reviews/{m.group(1)}.json"
+        titles = {c["id"]: c.get("title", "") for c in json.loads(rp.read_text()).get("cards", [])} if rp.exists() else {}
         for kind, cid in parse_ticks(issue.get("body") or ""):
             lines.append({"digest": m.group(1), "issue": issue["number"], "harvested": today,
-                          "kind": kind, "id": cid})
+                          "kind": kind, "id": cid, "title": titles.get(cid, "")})
         lines.append({"digest": m.group(1), "issue": issue["number"], "harvested": today,
                       "kind": "weekly-harvested"})
     append_lines(path, lines)

@@ -16,9 +16,12 @@ repository is also public, so cards, weekly issues and committed reports are pub
 **Decision.** Deterministic code fetches (`read`, `backlog read`) and marks files untrusted. Only
 the `reader` and `triage` subagents (`tools: Read, Write`, tested) open them. Their cards and
 verdicts are validated by `techdigest/cards.py` and `backlog.py` (no URLs, Markdown, HTML or
-shell commands; `fits` from `profile.md`) before anything renders. Flags are shown as a fixed
-warning, never quoted. The main session never opens `build/reads/`. Raw bookmark text stays in
-gitignored `backlog/raw/`.
+shell commands; `fits` from `profile.md`) before anything renders. A card stores only
+`flagged: true/false`, shown as a fixed warning. The main session never opens `build/reads/` and
+sees only code-made status text. `scope snapshot`/`check` wraps each subagent run, and the run
+stops on any change outside the subagent's output folder. A fail-closed write-scope hook for run
+branches (`.claude/hooks/guard-run-scope.py`) is the second layer, once the owner wires it. Raw
+bookmark text, verdicts and drafts stay in gitignored `backlog/`.
 
 **Rejected.** The main session using WebFetch or curl (attacker text in the session that holds
 the shell); a GitHub Actions reviewer (an OAuth secret and a second runtime); Custom-allowlist

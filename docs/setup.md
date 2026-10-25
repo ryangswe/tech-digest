@@ -66,8 +66,8 @@ claude.ai/code/routines → **New task** → **Set up manually**:
   Read CLAUDE.md, then follow prompts/daily.md exactly, step by step. This run is unattended:
   never ask questions, never push to main, never open a PR except the weekly interests PR that
   prompts/daily.md describes, and never edit any file outside digest/, state/ and build/ (plus
-  interests.md, only on a claude/interests-* branch). If a step fails, follow the failure rules
-  in prompts/daily.md and end the run.
+  interests.md and profile.md, only on a claude/interests-* branch). If a step fails, follow the
+  failure rules in prompts/daily.md and end the run.
   ```
 
 ## 4. Check you will get the email (1 min)

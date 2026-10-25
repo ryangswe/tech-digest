@@ -18,7 +18,7 @@ names, exactly; techdigest/cards.py reads this section. -->
 - riftsight-vision: open weights, labels and tools for recognising trading cards in gameplay video (small vision models, ONNX, in-browser inference).
 - Kenbunshoku: Chrome extension: hover a One Piece Card Game card in a Twitch or YouTube stream to see it. Looking for a maintainer.
 - DuelSight: the same hover-a-card Chrome extension for Yu-Gi-Oh! videos and streams, on the Chrome Web Store.
-- StackDepth: a pre-launch engineering-learning product about reasoning with and verifying AI-generated code; in discovery, no code yet.
+- StackDepth: an early-stage product (not public yet) about learning to engineer alongside AI coding tools.
 - Vantle: turns decision logic in code into flowcharts, checked against the real code by tests; early prototype in TypeScript.
 - cardvision-hq: my coordination repo: a daily standup page built by a scheduled agent run, and a cross-project calendar.
 - tech-digest: this daily digest: a stdlib-Python fetch, Claude picks, GitHub Action delivery.

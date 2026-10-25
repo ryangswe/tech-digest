@@ -48,7 +48,9 @@ def append_lines(path: Path, lines: list[dict]) -> None:
 def summary(lines: list[dict], today: str, days: int = 30) -> str:
     """Markdown for the Claude step: what the owner liked and disliked recently."""
     cutoff = (date.fromisoformat(today) - timedelta(days=days)).isoformat()
-    recent = [ln for ln in lines if ln.get("digest", "") >= cutoff and ln.get("kind") in SIGNALS]
+    # weekly lines carry an ISO week in "digest"; date them by when they were harvested
+    recent = [ln for ln in lines if ln.get("kind") in SIGNALS
+              and (ln.get("harvested") if "-W" in str(ln.get("digest", "")) else ln.get("digest", "")) >= cutoff]
     if not recent:
         return f"No feedback in the last {days} days."
     out = [f"Feedback from the last {days} days ({len(recent)} signals)."]

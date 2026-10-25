@@ -204,14 +204,17 @@ def cmd_dig_requests(args) -> int:
     from .deliver import DIGEST_LABEL, dig_requests
     from .state import write_json
     repo = args.repo or json.loads(Path(args.config).read_text()).get("repository", "")
-    r = subprocess.run(["gh", "api", f"repos/{repo}/issues?labels={DIGEST_LABEL}&state=open&per_page=20"],
-                       capture_output=True, text=True)
-    if r.returncode:
-        print(f"gh api failed ({r.stderr.strip()[:200]}); no 🔍 requests today", file=sys.stderr)
+    try:
+        r = subprocess.run(["gh", "api", f"repos/{repo}/issues?labels={DIGEST_LABEL}&state=open&per_page=20"],
+                           capture_output=True, text=True, timeout=60)
+        if r.returncode:
+            raise RuntimeError(f"exit {r.returncode}")
+        issues = [i for i in json.loads(r.stdout) if "pull_request" not in i]
+    except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as e:
+        print(f"gh api unavailable ({type(e).__name__}); no 🔍 requests today", file=sys.stderr)
         write_json(Path(args.out), [])
         return 0
-    issues = [i for i in json.loads(r.stdout) if "pull_request" not in i]
-    reqs = dig_requests(issues, Path("."))
+    reqs = dig_requests(issues, Path("."))[: args.max]
     write_json(Path(args.out), reqs)
     print(f"{len(reqs)} 🔍 request(s) -> {args.out}")
     return 0
@@ -275,6 +278,23 @@ def cmd_backlog(args) -> int:
         print(f"backlog: {e}", file=sys.stderr)
         return 2
     return 2
+
+
+def cmd_scope(args) -> int:
+    from .scope import check, snapshot
+    if args.step == "snapshot":
+        print(snapshot(Path(".")))
+        return 0
+    if not args.token:
+        print("scope check needs the token printed by scope snapshot", file=sys.stderr)
+        return 2
+    changed = check(Path("."), args.token)
+    if changed:
+        print("TAMPERING: the subagent changed files it must not touch: " + ", ".join(changed) +
+              ". Stop the run: push nothing, and say so in the final report.", file=sys.stderr)
+        return 2
+    print("scope ok: nothing outside the subagent's output folder changed")
+    return 0
 
 
 def cmd_report_failure(args) -> int:
@@ -367,6 +387,7 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("dig-requests", help="items you ticked 🔍 on the open digest issue -> build/dig.json")
     s.add_argument("--repo", help="owner/name (default: sources.json `repository`)")
     s.add_argument("--out", default="build/dig.json")
+    s.add_argument("--max", type=int, default=3, help="at most this many (with the top 3: 6 cards)")
     s.set_defaults(func=cmd_dig_requests)
 
     s = sub.add_parser("weekly", help="(Action, Mondays) build or publish the weekly Try-this issue")
@@ -381,6 +402,11 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--size", type=int, default=40)
     s.add_argument("--profile", default="profile.md")
     s.set_defaults(func=cmd_backlog)
+
+    s = sub.add_parser("scope", help="tamper check around a quarantined subagent")
+    s.add_argument("step", choices=["snapshot", "check"])
+    s.add_argument("token", nargs="?")
+    s.set_defaults(func=cmd_scope)
 
     s = sub.add_parser("report-failure", help="(Action) open a failure issue once per title")
     s.add_argument("--title", required=True)

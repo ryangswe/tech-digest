@@ -65,7 +65,12 @@ jobs:
           done
       - name: Open today's issue and close the previous one
         run: python3 -m techdigest deliver publish --date "$DAY" 2>&1 | tee -a run.log
+      - name: Delete the branch
+        run: git push -q origin --delete "$BRANCH"
       - name: Weekly Try-this issue (Mondays)
+        id: weekly
+        # Its own failure must not mark the (already delivered) digest as failed.
+        continue-on-error: true
         run: |
           python3 -m techdigest weekly prepare --date "$DAY" 2>&1 | tee -a run.log
           WEEK=$(python3 -c "import datetime, techdigest.weekly as w; print(w.week_id(datetime.date.fromisoformat('$DAY')))")
@@ -81,8 +86,12 @@ jobs:
             done
           fi
           python3 -m techdigest weekly publish --date "$DAY" 2>&1 | tee -a run.log
-      - name: Delete the branch
-        run: git push -q origin --delete "$BRANCH"
+      - name: Report a weekly failure as an issue
+        if: steps.weekly.outcome == 'failure'
+        run: |
+          { echo "Today's digest was delivered, but building or publishing this week's Try-this issue failed."
+            echo; echo "Run log: $RUN_URL"; echo; echo "Re-run the workflow after a fix; the step is idempotent."; } > weekly-failure.md
+          python3 -m techdigest report-failure --title "Try-this issue failed: $DAY" --body-file weekly-failure.md
       - name: Report the failure as an issue
         if: failure()
         run: |

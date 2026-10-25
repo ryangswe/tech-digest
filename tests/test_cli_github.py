@@ -70,6 +70,50 @@ class GitHubClientTest(unittest.TestCase):
         self.assertEqual(calls, ["GET", "POST"])
 
 
+class ReadCardsDigCliTest(unittest.TestCase):
+    def run_cli(self, *args):
+        out, err = io.StringIO(), io.StringIO()
+        from contextlib import redirect_stderr
+        with redirect_stdout(out), redirect_stderr(err):
+            code = main(["--config", str(ROOT / "sources.json"), *args])
+        return code, out.getvalue(), err.getvalue()
+
+    def test_read_then_cards_offline(self):
+        with TempDir() as d:
+            cands = {"date": "2026-10-24", "candidates": [
+                {"id": "00000000aa", "url": "https://example.org/blog/fresh-reviewer", "title": "T",
+                 "source": "s", "source_name": "S", "summary": ""}]}
+            (d / "c.json").write_text(json.dumps(cands))
+            code, out, _ = self.run_cli("read", "--ids", "00000000aa", "--candidates", str(d / "c.json"),
+                                        "--out", str(d / "reads"), "--fixtures", str(ROOT / "fixtures/reads"))
+            self.assertEqual(code, 0)
+            self.assertIn("read 1/1 ok", out)
+            self.assertNotIn("Splitting a reviewer", out)  # no page text in what the session sees
+            (d / "cards").mkdir()
+            (d / "cards/00000000aa.json").write_text(json.dumps({
+                "id": "00000000aa", "kind": "try", "effort": "1h", "fits": ["workflow kit"],
+                "confidence": "high", "what": "W.", "why_you": "Y.", "next_step": "S.",
+                "flags": ["page addressed agents"]}))
+            code, out, err = self.run_cli("cards", "--reads", str(d / "reads"), "--cards-dir", str(d / "cards"),
+                                          "--profile", str(ROOT / "profile.md"), "--out", str(d / "cards.json"))
+            self.assertEqual((code, err), (0, ""))
+            [card] = json.loads((d / "cards.json").read_text())
+            self.assertIs(card["flagged"], True)
+            self.assertEqual(card["url"], "https://example.org/blog/fresh-reviewer")
+
+    def test_read_unknown_id(self):
+        with TempDir() as d:
+            (d / "c.json").write_text(json.dumps({"date": "x", "candidates": []}))
+            self.assertEqual(self.run_cli("read", "--ids", "ffffffffff", "--candidates", str(d / "c.json"))[0], 2)
+
+    def test_dig_requests_without_gh_writes_empty_list(self):
+        with TempDir() as d, mock.patch("subprocess.run", side_effect=FileNotFoundError("gh")):
+            code, _, err = self.run_cli("dig-requests", "--out", str(d / "dig.json"))
+            self.assertEqual(code, 0)
+            self.assertEqual(json.loads((d / "dig.json").read_text()), [])
+            self.assertIn("unavailable", err)
+
+
 class StatusCliTest(unittest.TestCase):
     def status(self, *args):
         buf = io.StringIO()

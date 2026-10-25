@@ -52,6 +52,13 @@ class SummaryTest(unittest.TestCase):
         self.assertIn("- 2026-10-21: More TCG policy please", s)
         self.assertNotIn("Too old", s)
 
+    def test_weekly_lines_are_dated_by_harvest(self):
+        lines = [{"digest": "2025-W44", "harvested": "2025-11-01", "kind": "tried", "id": "a" * 10, "title": "Old"},
+                 {"digest": "2026-W43", "harvested": "2026-10-19", "kind": "tried", "id": "b" * 10, "title": "Skill lint"}]
+        s = summary(lines, "2026-10-23", 30)
+        self.assertIn("Tried (✅ done):\n- Skill lint", s)
+        self.assertNotIn("Old", s)
+
     def test_no_feedback(self):
         self.assertEqual(summary([], "2026-10-23"), "No feedback in the last 30 days.")
 

@@ -20,7 +20,7 @@ def card_rank(c: dict) -> tuple:
     """Flagged sources last (they tried to steer agents), then your 🔍 requests first, then
     try/adopt before watch/read-later, surer and smaller steps first."""
     from .cards import CONFIDENCE, EFFORTS, KINDS
-    return (bool(c.get("flags")), not c.get("asked"), KINDS.index(c["kind"]), CONFIDENCE.index(c["confidence"]),
+    return (bool(c.get("flagged")), not c.get("asked"), KINDS.index(c["kind"]), CONFIDENCE.index(c["confidence"]),
             EFFORTS.index(c["effort"]))
 
 
@@ -160,7 +160,7 @@ def to_markdown(d: dict) -> str:
             line = (f"- {asked}**{KIND_LABEL[c['kind']]} · {c['effort']}**: {_esc(c['next_step'])} "
                     f"_{_esc(c['title'])}_ · fits {_esc(fits)} "
                     f"([{_esc(c['source_name'] or 'Source')}]({_href(c['url'])}))")
-            L.append(line + (FLAG_NOTE if c.get("flags") else ""))
+            L.append(line + (FLAG_NOTE if c.get("flagged") else ""))
         L += [""]
     L += ["## 👀 Worth a skim", ""]
     L += [f"- {_esc(e['line'])} ({_links(e)})" for e in d["skim"]] or ["_Nothing else today._"]

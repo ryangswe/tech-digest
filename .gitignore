@@ -5,3 +5,4 @@ __pycache__/
 # Bookmark backlog: raw post and page text and report drafts stay local (the repo is public)
 backlog/raw/
 backlog/out/
+backlog/triage/
