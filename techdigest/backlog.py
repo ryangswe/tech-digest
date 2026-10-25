@@ -5,10 +5,11 @@
     backlog batches [--size 40]             -> backlog/raw/batches/batch-NNN.json (id lists)
       (triage subagents, tools Read+Write)  -> backlog/triage/batch-NNN.json
     backlog validate                        -> errors per batch file
-    backlog report                          -> backlog/out/summary.md, backlog/out/queue.json
+    backlog report                          -> reports/bookmarks-summary.md, backlog/queue.json
 
-Raw bookmark text and page text never leave `backlog/raw/` (gitignored). Where the report and
-the queue are committed is the owner's decision: the repository is public.
+Raw bookmark text, page text and per-bookmark verdicts never leave `backlog/raw/` and
+`backlog/triage/` (gitignored). The report and the queue are committed and public: the owner
+agreed on 2026-10-24. The queue holds only validated card text, links and titles made from it.
 """
 
 from __future__ import annotations

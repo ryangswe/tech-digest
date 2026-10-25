@@ -71,9 +71,15 @@ class ImportTest(unittest.TestCase):
 
 class RawStaysLocalTest(unittest.TestCase):
     def test_raw_and_out_are_gitignored(self):
-        for p in ("backlog/raw/items.json", "backlog/raw/reads/x.md", "backlog/out/summary.md"):
+        for p in ("backlog/raw/items.json", "backlog/raw/reads/x.md", "backlog/triage/batch-001.json"):
             r = subprocess.run(["git", "-C", str(ROOT), "check-ignore", "-q", p])
             self.assertEqual(r.returncode, 0, f"{p} must be gitignored")
+
+
+    def test_report_and_queue_are_committable(self):
+        for p in ("reports/bookmarks-summary.md", "backlog/queue.json"):
+            r = subprocess.run(["git", "-C", str(ROOT), "check-ignore", "-q", p])
+            self.assertEqual(r.returncode, 1, f"{p} must not be gitignored")
 
 
 class TriageTest(unittest.TestCase):

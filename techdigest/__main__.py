@@ -268,11 +268,12 @@ def cmd_backlog(args) -> int:
                 print(f"refusing to report: {len(bad)} batch(es) not valid yet (run backlog validate)", file=sys.stderr)
                 return 2
             md, queue = B.build_report(root)
-            out = root / "out"
-            out.mkdir(parents=True, exist_ok=True)
-            (out / "summary.md").write_text(md, encoding="utf-8")
-            write_json(out / "queue.json", queue)
-            print(f"wrote {out}/summary.md and {out}/queue.json ({len(queue)} cards queued)")
+            report = Path(args.reports) / "bookmarks-summary.md"
+            report.parent.mkdir(parents=True, exist_ok=True)
+            report.write_text(md, encoding="utf-8")
+            write_json(root / "queue.json", queue)  # the weekly Try-this issue drains this
+            print(f"wrote {report} and {root}/queue.json ({len(queue)} cards queued); both are "
+                  "committed and public")
             return 0
     except B.BacklogError as e:
         print(f"backlog: {e}", file=sys.stderr)
@@ -400,6 +401,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("path", nargs="?", help="import: the X archive (.zip or unzipped folder)")
     s.add_argument("--root", default="backlog")
     s.add_argument("--size", type=int, default=40)
+    s.add_argument("--reports", default="reports")
     s.add_argument("--profile", default="profile.md")
     s.set_defaults(func=cmd_backlog)
 

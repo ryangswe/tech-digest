@@ -55,6 +55,8 @@ class RunScopeTest(unittest.TestCase):
         self.assertEqual(self.hook(self.repo / "sources.json"), 2)
         git(self.repo, "checkout", "-qb", "claude/backlog-triage")
         self.assertEqual(self.hook(self.repo / "backlog/triage/batch-001.json"), 0)
+        self.assertEqual(self.hook(self.repo / "backlog/queue.json"), 0)
+        self.assertEqual(self.hook(self.repo / "reports/bookmarks-summary.md"), 0)
         self.assertEqual(self.hook(self.repo / "backlog/raw/items.json"), 2)
 
     def test_other_branches_unrestricted(self):
@@ -66,6 +68,12 @@ class RunScopeTest(unittest.TestCase):
         r = subprocess.run(["python3", str(self.repo / ".claude/hooks/guard-run-scope.py")],
                            input="not json", capture_output=True, text=True)
         self.assertEqual(r.returncode, 2)
+
+    def test_hook_is_wired_in_project_settings(self):
+        settings = json.loads((ROOT / ".claude/settings.json").read_text())
+        cmds = [h["command"] for m in settings["hooks"]["PreToolUse"] if "Write" in m["matcher"]
+                for h in m["hooks"]]
+        self.assertTrue(any("guard-run-scope.py" in c for c in cmds))
 
     def test_tamper_check(self):
         (self.repo / "build/reads").mkdir(parents=True)

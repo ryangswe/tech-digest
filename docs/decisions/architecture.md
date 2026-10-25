@@ -20,8 +20,9 @@ shell commands; `fits` from `profile.md`) before anything renders. A card stores
 `flagged: true/false`, shown as a fixed warning. The main session never opens `build/reads/` and
 sees only code-made status text. `scope snapshot`/`check` wraps each subagent run, and the run
 stops on any change outside the subagent's output folder. A fail-closed write-scope hook for run
-branches (`.claude/hooks/guard-run-scope.py`) is the second layer, once the owner wires it. Raw
-bookmark text, verdicts and drafts stay in gitignored `backlog/`.
+branches (`.claude/hooks/guard-run-scope.py`, wired with the owner's approval) is the second
+layer. Raw bookmark and page text and per-bookmark verdicts stay in gitignored `backlog/`; the
+bookmark report and queue are committed and public (the owner's decision, 2026-10-24).
 
 **Rejected.** The main session using WebFetch or curl (attacker text in the session that holds
 the shell); a GitHub Actions reviewer (an OAuth secret and a second runtime); Custom-allowlist

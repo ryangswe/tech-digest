@@ -8,7 +8,7 @@ this hook is what stops an injected Write from replacing repository code, hooks 
 
     claude/digest-*     build/**
     claude/interests-*  build/**, interests.md, profile.md
-    claude/backlog-*    build/**, backlog/triage/**, backlog/out/**
+    claude/backlog-*    build/**, backlog/triage/**, backlog/queue.json, reports/**
 
 Any other branch (normal development) is not restricted here. On a run branch this guard fails
 CLOSED: if it cannot decide, the write is blocked. Shell writes don't pass through it; the
@@ -23,7 +23,7 @@ import sys
 SCOPES = {
     "claude/digest-": ("build/",),
     "claude/interests-": ("build/", "interests.md", "profile.md"),
-    "claude/backlog-": ("build/", "backlog/triage/", "backlog/out/"),
+    "claude/backlog-": ("build/", "backlog/triage/", "backlog/queue.json", "reports/"),
 }
 
 
