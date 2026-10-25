@@ -5,6 +5,27 @@ Full rationale for this theme's decisions, newest first. The lean, auto-loaded i
 
 ---
 
+## 2026-10-24 — Untrusted page and bookmark text is read only by Read/Write-only subagents; their output reaches the owner only through code validation
+
+**Status:** live, indexed
+
+**Context.** v2 reads full web pages and the owner's bookmarked posts, all written by strangers.
+The daily session has a shell, Full network access (the owner's choice) and push rights. The
+repository is also public, so cards, weekly issues and committed reports are public.
+
+**Decision.** Deterministic code fetches (`read`, `backlog read`) and marks files untrusted. Only
+the `reader` and `triage` subagents (`tools: Read, Write`, tested) open them. Their cards and
+verdicts are validated by `techdigest/cards.py` and `backlog.py` (no URLs, Markdown, HTML or
+shell commands; `fits` from `profile.md`) before anything renders. Flags are shown as a fixed
+warning, never quoted. The main session never opens `build/reads/`. Raw bookmark text stays in
+gitignored `backlog/raw/`.
+
+**Rejected.** The main session using WebFetch or curl (attacker text in the session that holds
+the shell); a GitHub Actions reviewer (an OAuth secret and a second runtime); Custom-allowlist
+reading only (most cards would rest on titles).
+
+---
+
 ## 2026-10-23 — Claude writes picks JSON only; a deterministic renderer adds every link and enforces the format
 
 **Status:** live, indexed

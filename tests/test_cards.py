@@ -106,10 +106,15 @@ class DigestCardsTest(unittest.TestCase):
         lines = [ln for ln in section.splitlines() if ln.startswith("- ")]
         self.assertTrue(lines[0].startswith("- 🔍 **Read later"))   # asked first
         self.assertTrue(lines[1].startswith("- **Try · 1h**"))      # then try before watch
-        self.assertIn("ignored it.", lines[2])
+        self.assertIn("ignored it.", lines[2])                       # flagged source last
         self.assertIn("(https://example.com/1)", lines[1])
         self.assertEqual(validate_digest(d), [])
         self.assertLess(md.index("🧪"), md.index("👀"))
+
+    def test_flagged_card_ranks_last_even_if_asked(self):
+        cards = [{**self.cards[0], "asked": True, "kind": "try"}, self.cards[1]]
+        d = build_digest(good_picks(self.doc), self.doc, cards=cards)
+        self.assertEqual([c["id"] for c in d["cards"]], ["0000000001", "0000000000"])
 
     def test_no_cards_no_section_and_v1_digests_still_valid(self):
         d = build_digest(good_picks(self.doc), self.doc)

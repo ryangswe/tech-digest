@@ -17,9 +17,10 @@ from .cards import validate_cards_structure
 CARDS_MAX = 6
 KIND_LABEL = {"try": "Try", "adopt": "Adopt", "watch": "Watch", "read-later": "Read later"}
 def card_rank(c: dict) -> tuple:
-    """Your 🔍 requests first, then try/adopt before watch/read-later, smaller steps first."""
+    """Flagged sources last (they tried to steer agents), then your 🔍 requests first, then
+    try/adopt before watch/read-later, surer and smaller steps first."""
     from .cards import CONFIDENCE, EFFORTS, KINDS
-    return (not c.get("asked"), KINDS.index(c["kind"]), CONFIDENCE.index(c["confidence"]),
+    return (bool(c.get("flags")), not c.get("asked"), KINDS.index(c["kind"]), CONFIDENCE.index(c["confidence"]),
             EFFORTS.index(c["effort"]))
 
 

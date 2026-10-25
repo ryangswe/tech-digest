@@ -50,7 +50,7 @@ def _week_cards(repo: Path, monday: date) -> list[dict]:
 
 
 def _score(c: dict, votes: dict[str, int], asked: set[str]) -> tuple:
-    return (-(votes.get(c["id"], 0) + (2 if c["id"] in asked or c.get("asked") else 0)),
+    return (bool(c.get("flags")), -(votes.get(c["id"], 0) + (2 if c["id"] in asked or c.get("asked") else 0)),
             KINDS.index(c["kind"]), CONFIDENCE.index(c["confidence"]), EFFORTS.index(c["effort"]))
 
 
