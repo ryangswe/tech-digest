@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from .config import Config, Source
+from .config import UNDATED, Config, Source
 from .items import Item
 from .net import FetchError, http_get
 from .parse import PARSERS, page_hash, page_paragraphs, paragraph_hashes
@@ -52,7 +52,7 @@ def page_watch(src: Source, raw: bytes, sst: SourceState, now: datetime, today: 
 
 
 def _within_window(item: Item, src: Source, cfg: Config, now: datetime) -> bool:
-    if src.type in ("html_links", "page_watch") or item.published is None:
+    if src.type in UNDATED or src.type == "page_watch" or item.published is None:
         return True
     days = src.max_age_days if src.max_age_days is not None else cfg.default_max_age_days
     return item.published >= now - timedelta(days=days)
@@ -122,7 +122,7 @@ def run_fetch(cfg: Config, *, state_dir: Path, out_dir: Path, now: datetime | No
             entry["error"] = str(e)[:120] or type(e).__name__
         sst.record(src.id, entry["ok"], entry["fetched"], today)
         items = [i for i in items if _within_window(i, src, cfg, now) and _keyword_ok(i, src)]
-        if src.type == "html_links" and entry["fetched"] and not sst.bootstrapped(src.id):
+        if src.type in UNDATED and entry["fetched"] and not sst.bootstrapped(src.id):
             for it in items:  # undated listing: today's links are the baseline, not news
                 seen.mark(it.all_keys(), today)
             sst.set_bootstrapped(src.id, today)

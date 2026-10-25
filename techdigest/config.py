@@ -7,7 +7,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-TYPES = {"feed", "hn", "arxiv", "html_links", "page_watch"}
+TYPES = {"feed", "hn", "arxiv", "html_links", "page_watch", "changelog_md", "npm"}
+UNDATED = {"html_links", "changelog_md"}  # bootstrapped on first sight
 FLAVORS = {None, "reddit"}
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
@@ -34,6 +35,8 @@ class Source:
     pattern: str | None = None          # html_links: regex on the link's path
     exclude_paths: list[str] = field(default_factory=list)
     min_title_chars: int = 8
+    link_template: str | None = None    # changelog_md / npm: "https://…/tag/v{version}"
+    title_prefix: str = ""              # changelog_md / npm: "Claude Code " -> "Claude Code 2.1.310"
     note: str = ""
 
     @property
@@ -103,6 +106,8 @@ def parse_config(data: dict) -> Config:
                 re.compile(src.pattern)
             except re.error as e:
                 _fail(where, f"bad `pattern`: {e}")
+        if src.type in ("changelog_md", "npm") and src.link_template and "{version}" not in src.link_template:
+            _fail(where, "`link_template` must contain {version}")
         if not isinstance(src.cap, int) or src.cap < 0:
             _fail(where, "`cap` must be a non-negative integer")
         for listf in ("tags", "include", "exclude", "exclude_paths"):

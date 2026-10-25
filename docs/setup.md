@@ -40,7 +40,13 @@ claude.ai/code → open any cloud session's environment menu (or, later, the sch
 - **Environment variables:** none. **Network secrets:** none. **Setup script:** none.
 
 When you add a source to `sources.json` (for example by filling in a placeholder), add its host
-here too. A missing host shows in the digest's footer as `HTTP 403 (host_not_allowed)`.
+here too. A missing host shows in the digest's footer as `HTTP 403 (host_not_allowed)` or
+`Tunnel connection failed: 403 Forbidden`. The first cloud run (2026-10-24) showed that for
+`www.latent.space` and `riftbound.leagueoflegends.com`: check both are in the list, spelled exactly so.
+
+github.com itself only allows git operations from cloud sessions, so GitHub release feeds are
+read another way: Claude Code's `CHANGELOG.md` from `raw.githubusercontent.com`, transformers.js
+from `registry.npmjs.org`. Both hosts are in the default list.
 
 ## 3. Create the scheduled task (5 min)
 

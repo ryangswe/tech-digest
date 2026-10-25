@@ -43,9 +43,9 @@ We show that the agent harness changes SWE-bench scores by up to 9 points. Fixtu
 
 ## 🔧 Changed in my tools
 
+- Claude Code releases Claude Code 9.9.1: Added a fixture-only flag to skills · Fixed subagent context compaction in long sessions ([Claude Code releases](https://github.com/anthropics/claude-code/releases/tag/v9.9.1))
 - Anthropic News Claude API pricing changes for batch and caching (fixture) ([Anthropic News](https://www.anthropic.com/news/claude-fixture-pricing))
-- Claude Code releases v9.9.1: What's changed Added a fixture-only flag to skills Fixed subagent context compaction in long sessions ([Claude Code releases](https://github.com/anthropics/claude-code/releases/tag/v9.9.1))
-- transformers.js releases 4.9.0: Adds a fixture ONNX quantisation option. ([transformers.js releases](https://github.com/huggingface/transformers.js/releases/tag/4.9.0))
+- transformers.js releases transformers.js 4.9.0: Version 4.9.0 of @⁠huggingface/transformers was published to npm. ([transformers.js releases](https://github.com/huggingface/transformers.js/releases/tag/4.9.0))
 
 <details><summary>👍 / 👎 — tick any; a weekly run learns from them</summary>
 
@@ -75,12 +75,12 @@ We show that the agent harness changes SWE-bench scores by up to 9 points. Fixtu
 - [ ] 👎 Chrome for Developers: What's new in the side panel API (fixture) <!-- id:7ecc83afa0 -->
 - [ ] 👍 Anthropic (YouTube): Building agents with skills (fixture talk) <!-- id:e4127ba1e4 -->
 - [ ] 👎 Anthropic (YouTube): Building agents with skills (fixture talk) <!-- id:e4127ba1e4 -->
+- [ ] 👍 Claude Code releases: Claude Code 9.9.1 <!-- id:c0301bb4be -->
+- [ ] 👎 Claude Code releases: Claude Code 9.9.1 <!-- id:c0301bb4be -->
 - [ ] 👍 Anthropic News: Claude API pricing changes for batch and caching (fixture) <!-- id:c63d7adc1e -->
 - [ ] 👎 Anthropic News: Claude API pricing changes for batch and caching (fixture) <!-- id:c63d7adc1e -->
-- [ ] 👍 Claude Code releases: v9.9.1 <!-- id:6df6dca389 -->
-- [ ] 👎 Claude Code releases: v9.9.1 <!-- id:6df6dca389 -->
-- [ ] 👍 transformers.js releases: 4.9.0 <!-- id:9fe76bb8b9 -->
-- [ ] 👎 transformers.js releases: 4.9.0 <!-- id:9fe76bb8b9 -->
+- [ ] 👍 transformers.js releases: transformers.js 4.9.0 <!-- id:bed7083306 -->
+- [ ] 👎 transformers.js releases: transformers.js 4.9.0 <!-- id:bed7083306 -->
 
 </details>
 
