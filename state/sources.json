@@ -3,13 +3,16 @@
   "amo-policy": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25",
+   "last_ok": "2026-10-26",
    "page": {
-    "changed": "2026-10-24",
-    "checked": "2026-10-25",
-    "hash": "85d9e90f8f6cb40a1892b4ad17724b7929f4f9b9e2c4ece02ab2461a46feddfc",
+    "changed": "2026-10-26",
+    "checked": "2026-10-26",
+    "hash": "3d8e50508dcb1fc4333229bcb6a46fd95fd87af66e8082f9989dad2306c9fa2e",
     "paras": [
      "9b637fdac0",
+     "8af30f804a",
+     "2ff8bb0ec7",
+     "2759e74b25",
      "1c8a5c5d3e",
      "5d1918fce0",
      "5b4a5dccb0",
@@ -110,14 +113,14 @@
      "66aa99da26",
      "82489371ee",
      "3071468bea",
-     "257713c683",
+     "1645c314f4",
      "89373a2ec1",
      "5656400564",
-     "f442c180fd",
+     "f9c4c876f7",
      "5656400564",
-     "8d71fd254b",
+     "777c00bf5b",
      "5656400564",
-     "e53149ce0c"
+     "f442c180fd"
     ]
    }
   },
@@ -125,37 +128,37 @@
    "bootstrapped": "2026-10-24",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "anthropic-news": {
    "bootstrapped": "2026-10-24",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "arxiv": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "chrome-dev-blog": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "claude-code-releases": {
    "bootstrapped": "2026-10-25",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "cws-policy": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25",
+   "last_ok": "2026-10-26",
    "page": {
     "changed": "2026-10-24",
-    "checked": "2026-10-25",
+    "checked": "2026-10-26",
     "hash": "1054c4403f769afaa15de3116bb5405df86faccd9936a3bfed66e3552ca63a0e",
     "paras": [
      "be504f616f",
@@ -402,89 +405,89 @@
   "deepmind-blog": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "hf-blog": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "hn-front": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "hn-keywords": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "hn-show": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "latent-space": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "mozilla-addons-blog": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "openai-news": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "optcg-news": {
    "bootstrapped": "2026-10-24",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "reddit": {
    "empty_days": 0,
-   "fail_days": 1,
-   "last_ok": "2026-10-24"
+   "fail_days": 0,
+   "last_ok": "2026-10-26"
   },
   "riftbound-news": {
    "bootstrapped": "2026-10-25",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "simon-willison": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "transformers-js-releases": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "yt-ai-engineer": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "yt-ai-explained": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "yt-anthropic": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   },
   "yt-latent-space": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-25"
+   "last_ok": "2026-10-26"
   }
  }
 }

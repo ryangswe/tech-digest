@@ -1,0 +1,216 @@
+{
+ "cards": [
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "15m",
+   "fits": [
+    "RiftSight",
+    "Kenbunshoku",
+    "DuelSight"
+   ],
+   "flagged": false,
+   "id": "70ddd0dee3",
+   "kind": "try",
+   "next_step": "Read the listed and self-distributed preview page and note any change touching data transmission, consent or source submission that would affect a Firefox port of your extensions.",
+   "source": "amo-policy",
+   "source_name": "Firefox add-on policies",
+   "title": "Firefox add-on policies changed",
+   "url": "https://extensionworkshop.com/documentation/publish/add-on-policies/",
+   "what": "Mozilla is updating its Firefox Add-on Policies on Dec 1, 2026, with preview pages for listed and self-distributed add-ons and for enterprise add-ons. The current text covers no-surprises listings, source code submission, remote code, and data collection consent, including Firefox's built-in consent experience for Firefox 140 and later.",
+   "why_you": "Kenbunshoku, DuelSight and RiftSight are Chrome extensions that send data to a relay backend. If you ever ship a Firefox build, the data transmission and consent rules would apply. The change date is close, so a quick look at the previews is cheap."
+  },
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "1h",
+   "fits": [
+    "workflow kit",
+    "Claude Code workflow"
+   ],
+   "flagged": false,
+   "id": "19cf214775",
+   "kind": "try",
+   "next_step": "Skim your CLAUDE.md and rules files for lines that guard against failures the current model no longer makes, and list candidates to cut, keeping the mechanically checked ones.",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Lessons Outlive Their Failures: A Case Study of Rules for AI Coding Agents",
+   "url": "https://arxiv.org/abs/2610.32578",
+   "what": "A six-week, single-repository case study of rule files, skills, hooks and checks used by three AI agent tools. It logs 118 agent failures, with stale documentation the largest class. One LLM audit run found about half of known drift. Most replayed failures did not recur without their fix, but a mechanical check stopped the stale-count one. Results are exploratory.",
+   "why_you": "Your workflow kit relies on rules, a decisions record and a workflow check, and CLAUDE.md is size-capped. The paper suggests mechanical checks hold up while written rules go obsolete, which matches your approach and argues for retiring old rules."
+  },
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow"
+   ],
+   "flagged": true,
+   "id": "ac7e613aae",
+   "kind": "watch",
+   "next_step": "Open the post yourself and check whether it gives a method and numbers for code quality across checkpoints. If it does, note them as a possible review-gate check.",
+   "source": "reddit",
+   "source_name": "Reddit",
+   "title": "Opus 5.5 writes slop code, but succeeds anyways. A research project inspired by SlopCodeBench",
+   "url": "https://www.reddit.com/r/ClaudeAI/comments/1xfkhum/opus_55_writes_slop_code_but_succeeds_anyways_a/",
+   "what": "A Reddit post in r/ClaudeAI describing a research project inspired by SlopCodeBench, a benchmark where an agent adds a feature at each checkpoint on top of its own earlier code without breaking anything. The title says Opus 5.5 writes sloppy code but still succeeds. Only the title and a feed summary were available.",
+   "why_you": "It touches evals for coding agents, a priority topic, and you review agent code daily. The page could not be read, so the method and numbers are unknown and the fit is a guess from the title."
+  }
+ ],
+ "date": "2026-10-26",
+ "opener": "A quiet Monday: no Claude Code release, but Mozilla has a policy date and the harness papers are out in force.",
+ "ranker": "claude",
+ "schema_version": 2,
+ "skim": [
+  {
+   "discussions": [
+    {
+     "comments": 44,
+     "name": "HN · 195 points",
+     "points": 195,
+     "url": "https://news.ycombinator.com/item?id=50235780"
+    }
+   ],
+   "id": "f572f05deb",
+   "line": "The State of Context Engineering, a front-page HN thread.",
+   "link_name": "dbreunig.com",
+   "source": "hn-front",
+   "source_name": "Hacker News",
+   "title": "The State of Context Engineering",
+   "url": "https://www.dbreunig.com/2026/10/24/the-state-of-context-engineering.html"
+  },
+  {
+   "discussions": [
+    {
+     "name": "r/ClaudeAI",
+     "url": "https://www.reddit.com/r/ClaudeAI/comments/1xfs5q8/limits_got_at_least_halved/"
+    }
+   ],
+   "id": "d3642656ae",
+   "line": "A r/ClaudeAI user says their limits seem at least halved since the Opus 5.5 release, at the same usage.",
+   "link_name": "Reddit",
+   "source": "reddit",
+   "source_name": "Reddit",
+   "title": "Limits got at least halved?",
+   "url": "https://www.reddit.com/r/ClaudeAI/comments/1xfs5q8/limits_got_at_least_halved/"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 325,
+     "name": "HN · 334 points",
+     "points": 334,
+     "url": "https://news.ycombinator.com/item?id=50236102"
+    }
+   ],
+   "id": "4a62295acd",
+   "line": "HN asks why OpenAI and Anthropic cut LLM prices by up to 80% within a few months.",
+   "link_name": "minimaxir.com",
+   "source": "hn-front",
+   "source_name": "Hacker News",
+   "title": "OpenAI and Anthropic cut their LLM prices by up to 80% within a few months. Why?",
+   "url": "https://minimaxir.com/2026/10/cheap-llms/"
+  },
+  {
+   "discussions": [],
+   "id": "99411e160b",
+   "line": "HarnessMM: a paper on cutting harness token use through guarded decision reuse.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "HarnessMM: Recursive Self-Improvement for Harness Token Efficiency",
+   "url": "https://arxiv.org/abs/2610.32813"
+  },
+  {
+   "discussions": [],
+   "id": "9e0effde77",
+   "line": "StateMirror: a paper on catching hallucinated tool calls in coding agents before they run.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "StateMirror: Pre-Execution Detection of Hallucinated Tool Calls in Coding Agents",
+   "url": "https://arxiv.org/abs/2610.32648"
+  },
+  {
+   "discussions": [],
+   "id": "78798dad4a",
+   "line": "Greptile's co-founder on what to know before building your own code review agent.",
+   "link_name": "AI Engineer (YouTube)",
+   "source": "yt-ai-engineer",
+   "source_name": "AI Engineer (YouTube)",
+   "title": "How to Build an AI Code Review Agent - Daksh Gupta, Greptile",
+   "url": "https://www.youtube.com/watch?v=4UtrRVtUN_g"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 29,
+     "name": "HN · 46 points",
+     "points": 46,
+     "url": "https://news.ycombinator.com/item?id=50227041"
+    }
+   ],
+   "id": "bbd2455f18",
+   "line": "Show HN: ADRs for AI, deliberation records for human-AI work versioned in Git.",
+   "link_name": "adrs.systems",
+   "source": "hn-front",
+   "source_name": "Hacker News",
+   "title": "Show HN: ADRs for AI – Deliberation records for human–AI work, versioned in Git",
+   "url": "https://adrs.systems"
+  }
+ ],
+ "stats": {
+  "baseline": [],
+  "candidates": 47,
+  "failed": [],
+  "quiet": [],
+  "sources_ok": 24,
+  "sources_total": 24
+ },
+ "title": "☕ Tech Digest — Mon 26 Oct 2026",
+ "tools": [],
+ "top": [
+  {
+   "discussions": [],
+   "headline": "Mozilla updating Firefox add-on policies on December 1, 2026",
+   "id": "70ddd0dee3",
+   "link_name": "Firefox add-on policies",
+   "source": "amo-policy",
+   "source_name": "Firefox add-on policies",
+   "summary": "The AMO policy page lists changed text: Mozilla is updating Add-on Policies on Dec 1, 2026, with previews for listed and self-distributed add-ons and for enterprise add-ons. The page was last updated Oct 20, 2026.",
+   "title": "Firefox add-on policies changed",
+   "url": "https://extensionworkshop.com/documentation/publish/add-on-policies/",
+   "why": "Browser extension store policy is on your list, and this one comes with a date."
+  },
+  {
+   "discussions": [],
+   "headline": "Six-week case study of rules for AI coding agents",
+   "id": "19cf214775",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "summary": "A paper looks at harnesses made of rule files such as AGENTS.md, on-demand skills, runtime hooks and automated checks. Rather than short benchmark runs, the author reports a six-week case study of a personal system of record.",
+   "title": "Lessons Outlive Their Failures: A Case Study of Rules for AI Coding Agents",
+   "url": "https://arxiv.org/abs/2610.32578",
+   "why": "Rule files, skills and hooks are your daily harness, and this one is a longer-running look at them."
+  },
+  {
+   "discussions": [
+    {
+     "name": "r/ClaudeAI",
+     "url": "https://www.reddit.com/r/ClaudeAI/comments/1xfkhum/opus_55_writes_slop_code_but_succeeds_anyways_a/"
+    }
+   ],
+   "headline": "Opus 5.5 writes slop code, but succeeds anyways",
+   "id": "ac7e613aae",
+   "link_name": "Reddit",
+   "source": "reddit",
+   "source_name": "Reddit",
+   "summary": "A research project inspired by SlopCodeBench, a benchmark where an agent adds a feature at each checkpoint on top of its own earlier code without breaking anything.",
+   "title": "Opus 5.5 writes slop code, but succeeds anyways. A research project inspired by SlopCodeBench",
+   "url": "https://www.reddit.com/r/ClaudeAI/comments/1xfkhum/opus_55_writes_slop_code_but_succeeds_anyways_a/",
+   "why": "Evals for coding agents are on your list, and this one questions what a benchmark rewards."
+  }
+ ]
+}
