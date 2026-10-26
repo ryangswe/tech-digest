@@ -233,7 +233,7 @@ def cmd_backlog(args) -> int:
     try:
         if args.step == "import":
             if not args.path:
-                print("backlog import needs the archive path (zip or unzipped folder)", file=sys.stderr)
+                print("backlog import needs a path: the twitter-web-exporter JSON file, or an X archive (zip or folder)", file=sys.stderr)
                 return 2
             stats = B.import_archive(Path(args.path), root)
             print(json.dumps(stats, indent=1))
@@ -398,7 +398,7 @@ def main(argv: list[str] | None = None) -> int:
 
     s = sub.add_parser("backlog", help="(local, one-off) import and triage the X bookmark backlog")
     s.add_argument("step", choices=["import", "read", "batches", "validate", "report"])
-    s.add_argument("path", nargs="?", help="import: the X archive (.zip or unzipped folder)")
+    s.add_argument("path", nargs="?", help="import: a twitter-web-exporter JSON file, an X archive (.zip or folder), or a folder of either")
     s.add_argument("--root", default="backlog")
     s.add_argument("--size", type=int, default=40)
     s.add_argument("--reports", default="reports")

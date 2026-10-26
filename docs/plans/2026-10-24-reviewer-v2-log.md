@@ -42,3 +42,14 @@
     tested; wiring it into `.claude/settings.json` is the owner's call. Side channels closed;
     flags reduced to a boolean.
   - **Permanent decision record needed:** Yes (the quarantine entry is updated)
+
+- **2026-10-26 — T7: the X archive has no bookmarks**
+  - **Evidence:** the archive requested on 2026-10-24 (manifest and file list) holds likes, posts,
+    DMs and account data, but no bookmark file. X leaves bookmarks out of the download.
+  - **Impact:** `backlog import` had nothing to read; the X API route is paid and returns only
+    the most recent 800 bookmarks.
+  - **Resolution:** the owner chose the free twitter-web-exporter userscript. `backlog import`
+    now reads its JSON (full text of long posts, real link targets from "Include all metadata",
+    quoted posts, retweets) and warns when metadata is missing or the file is not a Bookmarks
+    export.
+  - **Permanent decision record needed:** No (a one-off input format)

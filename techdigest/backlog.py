@@ -1,6 +1,10 @@
 """One-off triage of the owner's X bookmark backlog. Runs locally, on the Mac with the archive.
 
-    backlog import <archive.zip | folder>   -> backlog/raw/items.json   (gitignored: raw text)
+    backlog import <archive.zip | folder | export.json>  -> backlog/raw/items.json  (gitignored)
+
+X's own archive leaves bookmarks out, so the usual input is a JSON export from the
+twitter-web-exporter userscript (Bookmarks module, "Include all metadata" ticked); the X archive's
+bookmark.js and X API bookmark pages are read too.
     backlog read                            -> backlog/raw/reads/       (linked pages, untrusted)
     backlog batches [--size 40]             -> backlog/raw/batches/batch-NNN.json (id lists)
       (triage subagents, tools Read+Write)  -> backlog/triage/batch-NNN.json
@@ -19,6 +23,7 @@ import json
 import re
 import zipfile
 from collections import Counter, defaultdict
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -51,7 +56,9 @@ def _archive_files(path: Path) -> dict[str, str]:
     """{name: text} for the archive's data files, from a .zip or an unzipped folder."""
     path = Path(path)
     out = {}
-    if path.is_file() and zipfile.is_zipfile(path):
+    if path.is_file() and path.suffix.lower() in (".js", ".json"):  # one exported file
+        out[path.name] = path.read_text(encoding="utf-8", errors="replace")
+    elif path.is_file() and zipfile.is_zipfile(path):
         with zipfile.ZipFile(path) as z:
             for n in z.namelist():
                 if re.search(r"(^|/)data/[^/]+\.(js|json)$", n):
@@ -60,8 +67,11 @@ def _archive_files(path: Path) -> dict[str, str]:
         for p in sorted(path.rglob("*")):
             if p.suffix in (".js", ".json") and p.is_file():
                 out[str(p.relative_to(path))] = p.read_text(encoding="utf-8", errors="replace")
+    elif path.is_file() and path.suffix.lower() in (".csv", ".html", ".htm"):
+        raise BacklogError(f"{path}: export as JSON (twitter-web-exporter's 'Export as' menu), "
+                           "with 'Include all metadata' ticked")
     else:
-        raise BacklogError(f"{path}: not a zip file or folder")
+        raise BacklogError(f"{path}: not a JSON export, zip file or folder")
     return out
 
 
@@ -103,17 +113,98 @@ def _norm(obj: dict, authors: dict[str, str]) -> dict | None:
             "created": created.date().isoformat() if created else None, "urls": _urls(obj)}
 
 
+# --- twitter-web-exporter (a userscript that saves what the Bookmarks page loads) -------------
+
+WEB_EXPORTER_KEYS = {"id", "full_text", "screen_name", "url"}
+QUOTED_CHARS = 1000
+
+
+def _is_web_export(data) -> bool:
+    return (isinstance(data, list) and bool(data) and isinstance(data[0], dict)
+            and WEB_EXPORTER_KEYS <= set(data[0]))
+
+
+def _graphql_tweet(obj):
+    """X's web API wraps some posts: {"__typename": "TweetWithVisibilityResults", "tweet": {...}}."""
+    if isinstance(obj, dict) and isinstance(obj.get("tweet"), dict) and "legacy" not in obj:
+        obj = obj["tweet"]
+    return obj if isinstance(obj, dict) and isinstance(obj.get("legacy"), dict) else None
+
+
+def _graphql_parts(t: dict) -> tuple[str, str, list[str]]:
+    """(author, text, outside links) of one web-API post; long posts keep their full text."""
+    note = (((t.get("note_tweet") or {}).get("note_tweet_results") or {}).get("result") or {})
+    legacy = t["legacy"]
+    text = note.get("text") or legacy.get("full_text") or ""
+    user = ((t.get("core") or {}).get("user_results") or {}).get("result") or {}
+    author = (user.get("core") or {}).get("screen_name") or (user.get("legacy") or {}).get("screen_name") or ""
+    urls = [u.get("expanded_url") for src in ((note.get("entity_set") or {}), (legacy.get("entities") or {}))
+            for u in (src.get("urls") or []) if isinstance(u, dict) and u.get("expanded_url")]
+    return author, text, list(dict.fromkeys(urls))
+
+
+def _exporter_date(rec: dict, t: dict | None) -> str | None:
+    raw = (t or {}).get("legacy", {}).get("created_at")  # "Wed Oct 10 20:19:24 +0000 2018"
+    if raw:
+        try:
+            return datetime.strptime(raw, "%a %b %d %H:%M:%S %z %Y").date().isoformat()
+        except ValueError:
+            pass
+    m = re.match(r"^(\d{4}-\d{2}-\d{2})", str(rec.get("created_at") or ""))  # its default format
+    return m.group(1) if m else None
+
+
+def _norm_web_export(rec: dict) -> dict | None:
+    if not isinstance(rec, dict) or not str(rec.get("id") or "").isdigit():
+        return None
+    t = _graphql_tweet(rec.get("metadata"))
+    if t and isinstance((t["legacy"].get("retweeted_status_result") or {}).get("result"), dict):
+        t = _graphql_tweet(t["legacy"]["retweeted_status_result"]["result"]) or t  # the original
+    if t:
+        author, text, urls = _graphql_parts(t)
+        quoted = _graphql_tweet((t.get("quoted_status_result") or {}).get("result"))
+        if quoted:  # the post it quotes is part of what was saved; its links come after the post's own
+            q_author, q_text, q_urls = _graphql_parts(quoted)
+            text += f"\n\n[Quoting @{q_author}] {q_text[:QUOTED_CHARS]}"
+            urls += [u for u in q_urls if u not in urls]
+        tid = str(t.get("rest_id") or t["legacy"].get("id_str") or rec["id"])
+    else:  # exported without "Include all metadata": only the t.co links in the text
+        author, text = rec.get("screen_name") or "", rec.get("full_text") or ""
+        urls, tid = re.findall(r"https?://\S+", text), str(rec["id"])
+    return {"tweet_id": tid if tid.isdigit() else str(rec["id"]), "text": text.strip(), "author": author,
+            "created": _exporter_date(rec, t), "urls": urls, "_metadata": bool(t),
+            "_bookmarked": rec.get("bookmarked")}
+
+
+def _web_export_warnings(rows: list[dict]) -> list[str]:
+    out = []
+    if sum(1 for r in rows if not r["_metadata"]) > 0.5 * len(rows):
+        out.append("most rows have no metadata, so their links are t.co short links that triage "
+                   "can't follow. Export again with 'Include all metadata' ticked.")
+    if sum(1 for r in rows if r["_bookmarked"] is False) > 0.5 * len(rows):
+        out.append("most rows are not marked as bookmarked: this looks like a Likes or timeline "
+                   "export. Export from the Bookmarks module.")
+    return out
+
+
 def parse_archive(path: Path) -> tuple[list[dict], dict]:
-    """Bookmarks from an X archive (zip or folder) or a folder of X API bookmark pages."""
+    """Bookmarks from an X archive (zip or folder), X API bookmark pages, or a
+    twitter-web-exporter JSON file (or a folder holding any of these)."""
     files = _archive_files(path)
-    found, notes = [], {"files": []}
+    found, notes = [], {"files": [], "warnings": []}
     for name, text in files.items():
         base = name.rsplit("/", 1)[-1].lower()
         try:
             data = _js_payload(text)
         except (json.JSONDecodeError, ValueError):
             continue
-        if isinstance(data, dict) and isinstance(data.get("data"), list):  # an X API page
+        if _is_web_export(data):
+            rows = [r for r in (_norm_web_export(o) for o in data) if r]
+            if rows:
+                notes["warnings"] += [f"{name}: {w}" for w in _web_export_warnings(rows)]
+            for r in rows:
+                del r["_metadata"], r["_bookmarked"]
+        elif isinstance(data, dict) and isinstance(data.get("data"), list):  # an X API page
             users = {u["id"]: u.get("username", "") for u in (data.get("includes") or {}).get("users", [])}
             rows = [_norm(o, users) for o in data["data"]]
         elif "bookmark" in base and isinstance(data, list):
@@ -189,9 +280,12 @@ def import_archive(path: Path, root: Path = Path("backlog")) -> dict:
     raw.mkdir(parents=True, exist_ok=True)
     (raw / "items.json").write_text(json.dumps(items, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     stats["files"] = notes["files"]
+    warnings = list(notes["warnings"])
     if stats["items"] and stats["ids_only"] > 0.5 * stats["items"]:
-        stats["warning"] = ("most bookmarks have no text (the archive holds only ids): triage would "
-                            "have nothing to read. Stop and choose a fallback (X API lookup) first.")
+        warnings.append("most bookmarks have no text (the archive holds only ids): triage would "
+                        "have nothing to read. Stop and choose a fallback (X API lookup) first.")
+    if warnings:
+        stats["warning"] = " ".join(warnings)
     return stats
 
 
