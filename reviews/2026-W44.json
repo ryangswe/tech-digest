@@ -1,0 +1,68 @@
+{
+ "backlog_ids": [],
+ "backlog_left": 0,
+ "cards": [
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": false,
+   "from": "digest 2026-10-25",
+   "id": "f0e7a1ae71",
+   "kind": "try",
+   "next_step": "Read the paper for the exact wording of the sentence, then add a similar sentence to your user-level instructions and watch whether agents stop following outdated conventions on your next few tasks.",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Stale Instruction Files Override the Code in Coding Agents: A One-Sentence Fix",
+   "url": "https://arxiv.org/abs/2610.30571",
+   "what": "A paper tested 40 Python projects where the instruction file asks for one convention and the code uses another. Without a fix, 90.1% of agent choices followed the stale file. One sentence in the user-level instruction file giving existing code precedence raised code-following from 4.2% to 91.4% and test pass rate from 89.4% to 100%.",
+   "why_you": "You rely on CLAUDE.md in every repo, including the workflow kit installed across your projects, so stale instructions are a real risk. A one-sentence user-level change is cheap, and the paper measured it on Claude Code."
+  },
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow"
+   ],
+   "flagged": false,
+   "from": "digest 2026-10-25",
+   "id": "f9737df205",
+   "kind": "watch",
+   "next_step": "Leave it for now. If you want the benchmark-reproduction findings, watch the first part of the talk when you have spare time.",
+   "source": "yt-ai-engineer",
+   "source_name": "AI Engineer (YouTube)",
+   "title": "Why Frontier Models Fail as Buy-Side Analysts - Janie Gu, Google DeepMind & Suyeol Yun, LinqAlpha",
+   "url": "https://www.youtube.com/watch?v=aVbRSIQO2dE",
+   "what": "Per the feed summary of a conference talk, a Google DeepMind product manager who leads Kaggle Benchmarks argues many AI benchmarks are broken: they do not reflect real work, are costly to keep current, and have unverifiable scores. After reproducing 65 industry benchmarks, Kaggle found problems. The video was not read.",
+   "why_you": "It touches benchmark trustworthiness, which relates to your interest in agent evals. The buy-side analyst angle is far from your projects, and only the summary was available, so the fit is a stretch."
+  },
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow"
+   ],
+   "flagged": false,
+   "from": "digest 2026-10-25",
+   "id": "3ee31c90d1",
+   "kind": "read-later",
+   "next_step": "Skim the abstract and method section to note the failure pattern, so you can check whether your own plan acceptance tests state every name they depend on.",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "What the Specification Did Not Say: Specification-Oracle Gaps in Test-Graded Coding-Agent Benchmarks",
+   "url": "https://arxiv.org/abs/2610.30635",
+   "what": "A paper defines a specification-oracle gap: benchmark tests that need names, paths or messages the task description never states. On SWE-Milestone, 25 of 98 milestones had such a test, and affected build units failed in 80.6% of runs versus 48.4%. The ranking held up, but scores shifted. The authors release an audit tool.",
+   "why_you": "You rely on review gates and evals of agent workflows. This shows how a test-graded benchmark can reward guessing upstream names, which is useful when judging benchmark claims. No project needs action now."
+  }
+ ],
+ "date": "2026-10-26",
+ "schema_version": 1,
+ "title": "🧪 Try this — week of 26 Oct 2026",
+ "week": "2026-W44"
+}
