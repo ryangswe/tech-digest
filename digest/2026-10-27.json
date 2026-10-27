@@ -1,0 +1,191 @@
+{
+ "cards": [
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "1h",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": false,
+   "id": "1dfb5717fc",
+   "kind": "read-later",
+   "next_step": "Read the cost section on caching-aware pricing, and note whether any of your workflows trim or reset context to save tokens.",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "The Hidden Costs of Forgetting: A Study of Trajectory Deletion in Software Engineering Agents",
+   "url": "https://arxiv.org/abs/2610.35496",
+   "what": "An empirical study of 42 trajectory-reduction configurations across 9,400 runs with two agents on SWE-bench Verified. Deleting large amounts of old-turn content, even all reasoning text, can preserve effectiveness if delayed. Agents re-fetch deleted content. Under caching-aware pricing, no configuration lowered costs.",
+   "why_you": "It is evidence on context management for coding agents, your top interest. It suggests that trimming context in your own harness may not save money once prompt caching is counted, which is relevant to long scheduled runs and subagent design."
+  },
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "1h",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": false,
+   "id": "d3feff8a8c",
+   "kind": "read-later",
+   "next_step": "Read the case study on how prescribed steps skipped decisive evidence, then ask which of your agents have fixed stages that a looser prompt could replace.",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Free to Look, Free to Reason: Simple LLM Harnesses Outdiagnose Hand-Crafted Root Cause Analysis Agents",
+   "url": "https://arxiv.org/abs/2610.35767",
+   "what": "A comparison on 90 validated microservice failure cases. Three simple harnesses that prescribe none of the model's calls beat five published hand-crafted root cause analysis agents (PR at 1 of 65 to 77 percent versus 16 to 53 percent). More reasoning effort added few points but multiplied time up to seven times.",
+   "why_you": "It is harness-design evidence: open-ended investigation beat fixed stages and role agents. That bears on how prescriptive your reader, reviewer and plan-gate agents should be. The domain is microservice diagnosis, not coding, so the fit is partial."
+  },
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": false,
+   "id": "f51c03207b",
+   "kind": "read-later",
+   "next_step": "Skim the full release notes for the subagent, SubagentStop and compaction items, then check whether any of your hooks or subagents relied on the old behaviour.",
+   "source": "claude-code-releases",
+   "source_name": "Claude Code releases",
+   "title": "Claude Code 2.1.311",
+   "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.311",
+   "what": "Claude Code release 2.1.311. The feed summary lists fixes: subagents can use MCP tools from servers that connect late, SubagentStop hooks no longer fire repeatedly, stale CLAUDE.md and MEMORY.md after compaction, long-context sessions now compact and continue, and a startup freeze from long CLAUDE.md list items.",
+   "why_you": "You run subagents, hooks and scheduled tasks daily, including the quarantined reader and scope-check hooks. The subagent, hook and compaction fixes touch your setup directly. Only the feed summary was available, so the fit is unconfirmed."
+  }
+ ],
+ "date": "2026-10-27",
+ "opener": "A batch heavy on agent harnesses and context trimming, plus one very large filing everyone is talking about.",
+ "ranker": "claude",
+ "schema_version": 2,
+ "skim": [
+  {
+   "discussions": [
+    {
+     "name": "r/ClaudeAI",
+     "url": "https://www.reddit.com/r/ClaudeAI/comments/1xfwogl/anthropic_files_s1_with_the_sec_for_proposed/"
+    },
+    {
+     "name": "r/ClaudeCode",
+     "url": "https://www.reddit.com/r/ClaudeCode/comments/1xfwyqq/anthropic_files_s1_with_the_sec_for_proposed/"
+    }
+   ],
+   "id": "648c2826ed",
+   "line": "Anthropic filed a Form S-1 with the SEC for a proposed initial public offering of its Class A common stock, to be listed on the Nasdaq Global Select Market.",
+   "link_name": "Anthropic News",
+   "source": "anthropic-news",
+   "source_name": "Anthropic News",
+   "title": "Anthropic files S-1 with the SEC for proposed initial public offering",
+   "url": "https://www.anthropic.com/news/s1-sec"
+  },
+  {
+   "discussions": [],
+   "id": "2c470e0e83",
+   "line": "OpenAI announced GPT-6.1 Terra, a fast, efficient model that leans on visual reasoning and computer use.",
+   "link_name": "Simon Willison",
+   "source": "simon-willison",
+   "source_name": "Simon Willison",
+   "title": "GPT-6.1 Terra",
+   "url": "https://simonwillison.net/2026/Oct/26/gpt-61-terra/"
+  },
+  {
+   "discussions": [],
+   "id": "0dc94d3b54",
+   "line": "MarkovSim is an agent harness with bounded context for long-horizon simulation workflows, where context management is the central problem.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "MarkovSim: an LLM Agent Harness with Bounded Context for Long-Horizon Computational Simulation",
+   "url": "https://arxiv.org/abs/2610.35349"
+  },
+  {
+   "discussions": [],
+   "id": "698ad2ef9a",
+   "line": "FeatureLoop is a benchmark of 61 human-reviewed tasks from 34 repositories, testing coding agents when users refine requirements over repeated rounds.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "FeatureLoop: Benchmarking Coding Agents under Evolving Requirements",
+   "url": "https://arxiv.org/abs/2610.35488"
+  },
+  {
+   "discussions": [],
+   "id": "d9086b89ce",
+   "line": "Hierarchical Skill Evolution for Coding Agent: a paper on distilling reusable procedural skills from coding trajectories so they generalize across repositories.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Hierarchical Skill Evolution for Coding Agent",
+   "url": "https://arxiv.org/abs/2610.35616"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 34,
+     "name": "HN · 148 points",
+     "points": 148,
+     "url": "https://news.ycombinator.com/item?id=50246238"
+    }
+   ],
+   "id": "8b69c4baa0",
+   "line": "Show HN: Hob, a free MIT-licensed desktop app for Mac, Windows and Linux that works on your files like the Claude and ChatGPT desktop apps, with the model running locally.",
+   "link_name": "github.com",
+   "source": "hn-keywords",
+   "source_name": "Hacker News",
+   "title": "Show HN: Hob - Open-source, on device alternative to Claude Cowork and ChatGPT",
+   "url": "https://github.com/FrigadeHQ/hob"
+  }
+ ],
+ "stats": {
+  "baseline": [],
+  "candidates": 57,
+  "failed": [],
+  "quiet": [],
+  "sources_ok": 24,
+  "sources_total": 24
+ },
+ "title": "☕ Tech Digest — Tue 27 Oct 2026",
+ "tools": [],
+ "top": [
+  {
+   "discussions": [],
+   "headline": "Claude Code 2.1.311 fixes a pile of subagent, hook and compaction bugs",
+   "id": "f51c03207b",
+   "link_name": "Claude Code releases",
+   "source": "claude-code-releases",
+   "source_name": "Claude Code releases",
+   "summary": "The release fixes long startup freezes when a CLAUDE.md holds a very long list item, subagents unable to use MCP tools from servers that finish connecting late, and stale MEMORY.md and CLAUDE.md content right after automatic compaction. SubagentStop hooks no longer run about twice a minute per running subagent. Standard-context sessions that run over 200K tokens now compact and continue instead of stopping with a usage-credits error.",
+   "title": "Claude Code 2.1.311",
+   "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.311",
+   "why": "Subagents, hooks, compaction and CLAUDE.md behaviour are the top of your list, and this release touches all four."
+  },
+  {
+   "discussions": [],
+   "headline": "Study asks why agents survive deleting old trajectory turns, and what it costs",
+   "id": "1dfb5717fc",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "summary": "Software engineering agents resend their whole trajectory to the model every turn, which motivates trimming it. Earlier work showed randomly deleting 75% of tokens in old turns may preserve agent effectiveness. This paper asks why, how agents compensate for the missing content, and what the hidden costs are.",
+   "title": "The Hidden Costs of Forgetting: A Study of Trajectory Deletion in Software Engineering Agents",
+   "url": "https://arxiv.org/abs/2610.35496",
+   "why": "Context-management techniques with evidence are on your want list, and this one examines what trimming costs an agent."
+  },
+  {
+   "discussions": [],
+   "headline": "Simple LLM harnesses outdiagnose hand-crafted root cause analysis agents",
+   "id": "d3feff8a8c",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "summary": "Many LLM agents for root cause analysis of microservice failures use hand-crafted investigation: standard operating procedures, fixed stages and role agents. Each is evaluated on its own data against few baselines, so it is unknown whether the design beats giving a model free rein. The paper's title reports that simple harnesses win.",
+   "title": "Free to Look, Free to Reason: Simple LLM Harnesses Outdiagnose Hand-Crafted Root Cause Analysis Agents",
+   "url": "https://arxiv.org/abs/2610.35767",
+   "why": "A result on harness design with a comparison against baselines, which is the kind of evidence you asked for on what works in agent setups."
+  }
+ ]
+}
