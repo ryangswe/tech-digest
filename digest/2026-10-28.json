@@ -1,0 +1,234 @@
+{
+ "cards": [
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow"
+   ],
+   "flagged": false,
+   "id": "f40a2ae608",
+   "kind": "watch",
+   "next_step": "Look for a written version or notes of the architecture before spending time on the video; revisit only if it describes how sandbox failures are handled.",
+   "source": "yt-latent-space",
+   "source_name": "Latent Space (YouTube)",
+   "title": "How Anthropic ships the #1 LLM in the World — with Katelyn Lesse and Angela Jiang",
+   "url": "https://www.youtube.com/watch?v=MRQTlwcW-aQ",
+   "what": "A Latent Space video interview about how Anthropic ships its models. The feed summary describes the brain and the hands architecture for Claude Managed Agents, where an agent's sandbox can die without taking the whole agent with it. No transcript was available.",
+   "why_you": "The split between agent and sandbox is a harness design idea relevant to your scheduled cloud tasks and quarantined subagents. Only the summary was available, so the fit is a guess."
+  },
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "1h",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": false,
+   "id": "489cdb7166",
+   "kind": "read-later",
+   "next_step": "Read the findings on tool-definition size and on revisions to tool-use and attribution instructions, and note anything bearing on how much context your skills and agents add.",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Hidden in Plain Sight: an Empirical Study about The Instruction Stacks of Coding Agents",
+   "url": "https://arxiv.org/abs/2610.37332",
+   "what": "An empirical study of the instruction stacks (instructions, tool definitions, context) in the first model requests of 1,886 releases of Claude Code, Codex, Gemini CLI, Qwen Code and OpenCode. Tool definitions dominate three agents' latest requests. Only 48% of change units explain why the stack changed.",
+   "why_you": "You tune CLAUDE.md, skills and subagents on top of Claude Code's own hidden instruction layer. This shows how that layer changes between releases, which can affect your harness behaviour and context budget."
+  },
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "15m",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": false,
+   "id": "751c603977",
+   "kind": "read-later",
+   "next_step": "Skim the full release notes for the skills and CLAUDE.md fixes, then check whether any of your repos hit the large-file overwrite or the skills-after-cd case.",
+   "source": "claude-code-releases",
+   "source_name": "Claude Code releases",
+   "title": "Claude Code 2.1.312",
+   "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.312",
+   "what": "Claude Code 2.1.312 release notes (from the feed summary only). Adds a gateway setting for identifying users by an id_token claim, and click to send for queued messages. Fixes include Claude overwriting very large CLAUDE.md or rules files after reading only the start, and path-scoped skills not found after a Bash cd.",
+   "why_you": "You rely on skills, rules files and CLAUDE.md in the workflow kit. The fixes for path-scoped skills after a cd and for large rules files being overwritten touch exactly those features."
+  }
+ ],
+ "date": "2026-10-28",
+ "opener": "A mid-week batch heavy on Claude Code housekeeping and agent-harness research, with the rest of the internet busy admiring new Macs.",
+ "ranker": "claude",
+ "schema_version": 2,
+ "skim": [
+  {
+   "discussions": [],
+   "id": "52f78983db",
+   "line": "FeatureArc is a benchmark for coding agents that tests successive feature extensions on earlier code, rather than a single request on a fixed codebase.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "FeatureArc: Benchmarking Coding Agents on Evolving Features",
+   "url": "https://arxiv.org/abs/2610.37434"
+  },
+  {
+   "discussions": [],
+   "id": "e269120399",
+   "line": "A paper argues a trained model's policy and its harness are intertwined, so judging harness revisions only by how an already trained model performs may mislead.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Your Policy Is Secretly a Harness: The Decision Geometry of Agent Interfaces",
+   "url": "https://arxiv.org/abs/2610.37255"
+  },
+  {
+   "discussions": [
+    {
+     "name": "r/ClaudeAI",
+     "url": "https://www.reddit.com/r/ClaudeAI/comments/1xhi21l/i_got_claude_opus_55_to_render_photoreal_blender/"
+    }
+   ],
+   "id": "0bb1fd8be2",
+   "line": "A Reddit post on getting Claude Opus 5.5 and Claude Code to write Blender scripts for photoreal renders; the author says the first version of every scene was bad and describes what fixed them.",
+   "link_name": "Reddit",
+   "source": "reddit",
+   "source_name": "Reddit",
+   "title": "I got Claude Opus 5.5 to render photoreal Blender scenes — it took 3 failed attempts per scene, here’s what actually fixed them",
+   "url": "https://www.reddit.com/r/ClaudeAI/comments/1xhi21l/i_got_claude_opus_55_to_render_photoreal_blender/"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 28,
+     "name": "HN · 31 points",
+     "points": 31,
+     "url": "https://news.ycombinator.com/item?id=50260571"
+    }
+   ],
+   "id": "2071473050",
+   "line": "Show HN: a spec-first agentic development plugin, with the author reporting over 1000 specifications leading to about 500k lines of code since the start of 2026.",
+   "link_name": "spec-first.dev",
+   "source": "hn-keywords",
+   "source_name": "Hacker News",
+   "title": "Show HN: Specification First Agentic Development Plugin and Prove",
+   "url": "https://spec-first.dev/"
+  },
+  {
+   "discussions": [],
+   "id": "a4ba7b2af2",
+   "line": "transformers.js 4.3.2 is published to npm.",
+   "link_name": "transformers.js releases",
+   "source": "transformers-js-releases",
+   "source_name": "transformers.js releases",
+   "title": "transformers.js 4.3.2",
+   "url": "https://github.com/huggingface/transformers.js/releases/tag/4.3.2"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 277,
+     "name": "HN · 527 points",
+     "points": 527,
+     "url": "https://news.ycombinator.com/item?id=50260814"
+    }
+   ],
+   "id": "d8c15d8cd1",
+   "line": "HN thread (527 points) titled 'Anthropic trained Claude on illegally obtained Stanford professors' books'; the candidate carries no further detail.",
+   "link_name": "stanforddaily.com",
+   "source": "hn-keywords",
+   "source_name": "Hacker News",
+   "title": "Anthropic trained Claude on illegally obtained Stanford professors' books",
+   "url": "https://stanforddaily.com/2026/10/27/professors-books-pirated-to-train-claude/"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 530,
+     "name": "HN · 917 points",
+     "points": 917,
+     "url": "https://news.ycombinator.com/item?id=50261319"
+    }
+   ],
+   "id": "21ec57e4e0",
+   "line": "DeepMind introduces Genie 4, a new world model it describes as unlocking unprecedented realism in real-time simulation.",
+   "link_name": "Google DeepMind blog",
+   "source": "deepmind-blog",
+   "source_name": "Google DeepMind blog",
+   "title": "Genie 4: A new generation of world simulation",
+   "url": "https://deepmind.google/blog/genie-4-a-new-generation-of-world-simulation/"
+  }
+ ],
+ "stats": {
+  "baseline": [],
+  "candidates": 55,
+  "failed": [
+   {
+    "error": "network error: The read operation timed out",
+    "id": "latent-space",
+    "name": "Latent Space"
+   }
+  ],
+  "quiet": [],
+  "sources_ok": 23,
+  "sources_total": 24
+ },
+ "title": "☕ Tech Digest — Wed 28 Oct 2026",
+ "tools": [
+  {
+   "discussions": [
+    {
+     "comments": 29,
+     "name": "HN · 43 points",
+     "points": 43,
+     "url": "https://news.ycombinator.com/item?id=50266701"
+    }
+   ],
+   "id": "3e55ee7687",
+   "line": "Anthropic announces an expanded partnership with the GSA to bring Claude to all levels of government.",
+   "link_name": "Anthropic News",
+   "source": "anthropic-news",
+   "source_name": "Anthropic News",
+   "title": "Expanding our partnership with GSA to bring Claude to all levels of government",
+   "url": "https://www.anthropic.com/news/expanding-partnership-gsa"
+  }
+ ],
+ "top": [
+  {
+   "discussions": [],
+   "headline": "Claude Code 2.1.312 fixes skills lookup and large CLAUDE.md overwrites",
+   "id": "751c603977",
+   "link_name": "Claude Code releases",
+   "source": "claude-code-releases",
+   "source_name": "Claude Code releases",
+   "summary": "The release adds an oidc.user_id_claim option to the Claude apps gateway and click to send for queued messages in fullscreen. Fixes include Claude overwriting a very large CLAUDE.md, rules file or @-included file after seeing only its start (Write now asks it to read it all or edit in place), and per-directory and paths: skills not being found after a Bash cd deeper into a git repository.",
+   "title": "Claude Code 2.1.312",
+   "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.312",
+   "why": "Skills with paths: and big CLAUDE.md files are exactly how this repo is set up, so both fixes touch your daily workflow."
+  },
+  {
+   "discussions": [],
+   "headline": "Latent Space talks to Anthropic about the 'brain and hands' Managed Agents design",
+   "id": "f40a2ae608",
+   "link_name": "Latent Space (YouTube)",
+   "source": "yt-latent-space",
+   "source_name": "Latent Space (YouTube)",
+   "summary": "The episode covers how an agent's sandbox can die without taking the whole agent with it, the idea behind 'the brain and the hands', Anthropic's architecture for Claude Managed Agents. It features Katelyn Lesse and Angela Jiang.",
+   "title": "How Anthropic ships the #1 LLM in the World — with Katelyn Lesse and Angela Jiang",
+   "url": "https://www.youtube.com/watch?v=MRQTlwcW-aQ",
+   "why": "A first-party-adjacent look at a harness design, which sits at the top of your list for agentic coding practice."
+  },
+  {
+   "discussions": [],
+   "headline": "Study maps the hidden instruction stacks that coding agents send to models",
+   "id": "489cdb7166",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "summary": "Coding agents send models more than the user's prompt: added instructions, tool definitions and environmental context form an instruction stack. The paper says this stack steers execution and changes across releases, yet is largely unexposed to users and insufficiently characterized.",
+   "title": "Hidden in Plain Sight: an Empirical Study about The Instruction Stacks of Coding Agents",
+   "url": "https://arxiv.org/abs/2610.37332",
+   "why": "Context management and harness behaviour are your top topics, and this is an empirical look at what actually reaches the model."
+  }
+ ]
+}
