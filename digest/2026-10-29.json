@@ -1,0 +1,210 @@
+{
+ "cards": [
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "15m",
+   "fits": [
+    "DuelSight",
+    "RiftSight"
+   ],
+   "flagged": false,
+   "id": "5dc5f96a01",
+   "kind": "watch",
+   "next_step": "Nothing to do now. If you ever submit to AMO, accept the updated agreement when prompted and keep submitting the normal way.",
+   "source": "mozilla-addons-blog",
+   "source_name": "Mozilla Add-ons blog",
+   "title": "Introducing enterprise add-on policies",
+   "url": "https://blog.mozilla.org/addons/2026/10/28/introducing-enterprise-add-on-policies/",
+   "what": "Mozilla will launch a separate enterprise add-on release channel on AMO on December 1, 2026, with its own lighter policies. Enterprise versions are declared with a manifest key and are distributed only through that channel. Public add-ons submit as usual, but every developer must accept an updated distribution agreement.",
+   "why_you": "Your hover-card extensions are public Chrome add-ons, not enterprise tools, so the new channel does not apply. The profile shows no Firefox listing, so this matters only if you ever publish on AMO, where you would need to accept the agreement."
+  },
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "1h",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": false,
+   "id": "2d0e70e06c",
+   "kind": "read-later",
+   "next_step": "Read the paper's method and failure analysis on long-session inertia, and note whether any finding suggests a change to how your kit's agents keep state across long runs.",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "kw-bench: Breaking Frontier Harnesses on Real-World Tasks",
+   "url": "https://arxiv.org/abs/2610.36405",
+   "what": "kw-bench is a benchmark of investigative knowledge-work tasks, starting with a five-year VAT reconstruction across SAP systems, graded deterministically with no LLM judge. With the same cheaper model, Claude Code and Codex scored zero while OpenCode and micro-cc scored about 0.53. On a frontier model, Claude Code and micro-cc reached about 1.0.",
+   "why_you": "It is a harness evaluation with deterministic grading, the kind your interests list asks for. It claims the harness decides outcomes below the frontier, which bears on your subagent and review-gate setup, though you run on frontier models."
+  },
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "1h",
+   "fits": [
+    "Claude Code workflow"
+   ],
+   "flagged": true,
+   "id": "8e6ff33654",
+   "kind": "watch",
+   "next_step": "Skim the talk when convenient and note only how they measured lead time, which you could borrow for judging your own agent runs.",
+   "source": "yt-ai-engineer",
+   "source_name": "AI Engineer (YouTube)",
+   "title": "How Revolut Cut AI Coding Costs 90% With Self-Hosted Open Models - David Abitbol, Revolut",
+   "url": "https://www.youtube.com/watch?v=Ok6QdZHCcI8",
+   "what": "A talk by Revolut's head of AI operations, using data from 2,000 engineers on how AI tools changed coding time and lead time. The summary says self-hosting open GLM models gave about 60-70 percent faster delivery at roughly a tenth of frontier-lab spend. Only the feed summary was available.",
+   "why_you": "You run Claude Code daily as a solo developer, so a self-hosted fleet is unlikely to pay off at your scale. The cost-versus-lead-time data may still inform how you think about model choice in your workflow."
+  }
+ ],
+ "date": "2026-10-29",
+ "opener": "A Gemini launch and a pile of agent papers, with one quiet browser-store policy note hiding in the middle.",
+ "ranker": "claude",
+ "schema_version": 2,
+ "skim": [
+  {
+   "discussions": [
+    {
+     "comments": 154,
+     "name": "HN · 418 points",
+     "points": 418,
+     "url": "https://news.ycombinator.com/item?id=50284255"
+    }
+   ],
+   "id": "7ed6398608",
+   "line": "HN thread (418 points): Claude Code regularly sends each background agent's transcript to its model.",
+   "link_name": "gist.github.com",
+   "source": "hn-front",
+   "source_name": "Hacker News",
+   "title": "Claude Code regularly sends each background agent’s transcript to its model",
+   "url": "https://gist.github.com/flamerix-ai/c3905705cc4205e5de3011fa2e74efce"
+  },
+  {
+   "discussions": [],
+   "id": "6e4bcf26fb",
+   "line": "Paper on over-compliant refactoring: coding agents that keep editing after no edit improves the code add churn, technical debt and review burden.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Your Wish Is My Commit: Over-Compliant Refactoring in AI Coding Agents",
+   "url": "https://arxiv.org/abs/2610.36346"
+  },
+  {
+   "discussions": [],
+   "id": "a24a64bee3",
+   "line": "InfraDev asks whether coding agents can develop AI infrastructure, arguing existing benchmarks cover only single kernels or single-GPU tasks.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "InfraDev: Can Coding Agents Develop AI Infrastructure, and How Can We Tell?",
+   "url": "https://arxiv.org/abs/2610.36589"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 762,
+     "name": "HN · 951 points",
+     "points": 951,
+     "url": "https://news.ycombinator.com/item?id=50276792"
+    }
+   ],
+   "id": "8cd3da5390",
+   "line": "Gemini 4 Carbon: Google's next frontier model (HN, 951 points).",
+   "link_name": "blog.google",
+   "source": "hn-front",
+   "source_name": "Hacker News",
+   "title": "Gemini 4 Carbon",
+   "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 154,
+     "name": "HN · 241 points",
+     "points": 241,
+     "url": "https://news.ycombinator.com/item?id=50275626"
+    }
+   ],
+   "id": "4ff53c83a5",
+   "line": "Dayjob: Tax, an evaluation of AI agents on 50 professional tax assignments (HN, 241 points).",
+   "link_name": "surgehq.ai",
+   "source": "hn-front",
+   "source_name": "Hacker News",
+   "title": "Dayjob: Tax – evaluating AI agents on 50 professional tax assignments",
+   "url": "https://surgehq.ai/blog/dayjob-tax"
+  },
+  {
+   "discussions": [],
+   "id": "57b4c703ad",
+   "line": "Temporal's survey says 80.8% of engineers use agents daily but only 49.1% run them in production; a talk on the four gaps behind that.",
+   "link_name": "AI Engineer (YouTube)",
+   "source": "yt-ai-engineer",
+   "source_name": "AI Engineer (YouTube)",
+   "title": "We Trust AI Agents That Break Every Day - Shy Ruparel, Temporal",
+   "url": "https://www.youtube.com/watch?v=mJ7q8CuVmbw"
+  },
+  {
+   "discussions": [
+    {
+     "name": "r/LocalLLaMA",
+     "url": "https://www.reddit.com/r/LocalLLaMA/comments/1xi7390/qwen4_1m_context_window/"
+    }
+   ],
+   "id": "dbedd20444",
+   "line": "Reddit: Qwen4 models are said to have a 1 million token context window, with Qwen4-max dated November 1st.",
+   "link_name": "Reddit",
+   "source": "reddit",
+   "source_name": "Reddit",
+   "title": "Qwen4 1M context window",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1xi7390/qwen4_1m_context_window/"
+  }
+ ],
+ "stats": {
+  "baseline": [],
+  "candidates": 58,
+  "failed": [],
+  "quiet": [],
+  "sources_ok": 24,
+  "sources_total": 24
+ },
+ "title": "☕ Tech Digest — Thu 29 Oct 2026",
+ "tools": [],
+ "top": [
+  {
+   "discussions": [],
+   "headline": "Mozilla announces enterprise add-on policies for AMO, launching December 1",
+   "id": "5dc5f96a01",
+   "link_name": "Mozilla Add-ons blog",
+   "source": "mozilla-addons-blog",
+   "source_name": "Mozilla Add-ons blog",
+   "summary": "Mozilla says enterprise add-ons will launch on addons.mozilla.org on December 1, 2026. It cites input from enterprise organizations that distribute add-ons strictly via Firefox, and introduces enterprise add-on policies.",
+   "title": "Introducing enterprise add-on policies",
+   "url": "https://blog.mozilla.org/addons/2026/10/28/introducing-enterprise-add-on-policies/",
+   "why": "Add-on store policy changes are on your list under browser extensions, and this one comes with a firm date."
+  },
+  {
+   "discussions": [],
+   "headline": "Revolut reports data from 2,000 engineers on AI coding tools and self-hosted models",
+   "id": "8e6ff33654",
+   "link_name": "AI Engineer (YouTube)",
+   "source": "yt-ai-engineer",
+   "source_name": "AI Engineer (YouTube)",
+   "summary": "David Abitbol, who leads AI operations at Revolut, shares data from 2,000 engineers on what AI tools did to coding time and lead time. He says self-hosting open-source GLM models made the biggest difference: about 60-70% faster delivery at roughly a tenth of what they were paying frontier labs.",
+   "title": "How Revolut Cut AI Coding Costs 90% With Self-Hosted Open Models - David Abitbol, Revolut",
+   "url": "https://www.youtube.com/watch?v=Ok6QdZHCcI8",
+   "why": "Numbers on how an agent workflow was measured across a large team fit your interest in evals and agentic coding practice."
+  },
+  {
+   "discussions": [],
+   "headline": "kw-bench: a benchmark for breaking frontier coding-agent harnesses on real-world tasks",
+   "id": "2d0e70e06c",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "summary": "The paper notes that inside a harness (a loop, a shell, a filesystem, the ability to write and run code) a model can take on increasingly difficult work. It treats the coding-agent harness as infrastructure and introduces kw-bench.",
+   "title": "kw-bench: Breaking Frontier Harnesses on Real-World Tasks",
+   "url": "https://arxiv.org/abs/2610.36405",
+   "why": "Harness design and how to evaluate it are at the top of your list."
+  }
+ ]
+}

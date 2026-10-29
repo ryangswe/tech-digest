@@ -3,10 +3,10 @@
   "amo-policy": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28",
+   "last_ok": "2026-10-29",
    "page": {
     "changed": "2026-10-26",
-    "checked": "2026-10-28",
+    "checked": "2026-10-29",
     "hash": "3d8e50508dcb1fc4333229bcb6a46fd95fd87af66e8082f9989dad2306c9fa2e",
     "paras": [
      "9b637fdac0",
@@ -128,37 +128,37 @@
    "bootstrapped": "2026-10-24",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "anthropic-news": {
    "bootstrapped": "2026-10-24",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "arxiv": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "chrome-dev-blog": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "claude-code-releases": {
    "bootstrapped": "2026-10-25",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "cws-policy": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28",
+   "last_ok": "2026-10-29",
    "page": {
     "changed": "2026-10-24",
-    "checked": "2026-10-28",
+    "checked": "2026-10-29",
     "hash": "1054c4403f769afaa15de3116bb5405df86faccd9936a3bfed66e3552ca63a0e",
     "paras": [
      "be504f616f",
@@ -405,89 +405,89 @@
   "deepmind-blog": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "hf-blog": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "hn-front": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "hn-keywords": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "hn-show": {
-   "empty_days": 0,
+   "empty_days": 1,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "latent-space": {
    "empty_days": 0,
-   "fail_days": 1,
-   "last_ok": "2026-10-27"
+   "fail_days": 0,
+   "last_ok": "2026-10-29"
   },
   "mozilla-addons-blog": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "openai-news": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "optcg-news": {
    "bootstrapped": "2026-10-24",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "reddit": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "riftbound-news": {
    "bootstrapped": "2026-10-25",
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "simon-willison": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "transformers-js-releases": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "yt-ai-engineer": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "yt-ai-explained": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "yt-anthropic": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   },
   "yt-latent-space": {
    "empty_days": 0,
    "fail_days": 0,
-   "last_ok": "2026-10-28"
+   "last_ok": "2026-10-29"
   }
  }
 }
