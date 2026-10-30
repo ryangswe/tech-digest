@@ -1,0 +1,211 @@
+{
+ "cards": [
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "15m",
+   "fits": [
+    "tech-digest"
+   ],
+   "flagged": false,
+   "id": "e05989bb27",
+   "kind": "watch",
+   "next_step": "Check whether your own Anthropic plan shows API credits in its billing page, and note whether they could cover digest or agent experiments. No action on the OpenAI side.",
+   "source": "simon-willison",
+   "source_name": "Simon Willison",
+   "title": "API credits benefit for eligible ChatGPT subscriptions",
+   "url": "https://simonwillison.net/2026/Oct/29/api-credits/",
+   "what": "Simon Willison notes OpenAI now gives $100, $200 and $500 per month ChatGPT subscribers matching API credits, applied to an API organization. He says it mirrors a benefit Anthropic announced earlier this month for Max and Team plans, and that he may ship public demos because credits are covered.",
+   "why_you": "If you hold a Max plan, the Anthropic credits may already cover API experiments such as tech-digest tooling. The OpenAI side is a one-line pricing move for you. The fit to your projects is a stretch."
+  },
+  {
+   "asked": false,
+   "confidence": "high",
+   "effort": "1h",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": false,
+   "id": "502fe37057",
+   "kind": "read-later",
+   "next_step": "Skim the show notes and listen to the brain and hands and credentials segments near the end. Note anything worth adding to your workflow kit's security or harness guidance.",
+   "source": "latent-space",
+   "source_name": "Latent Space",
+   "title": "How Anthropic ships Claude with Claude: Separating the Brain from the Hands",
+   "url": "https://latent.space/p/opus55/",
+   "what": "Latent Space interview with Anthropic's heads of engineering and product on the Opus 5.5 launch. Covers pricing cuts, enforcing preserved thinking blocks across turns against distillation, a new API compaction feature, Managed Agents separating session and harness from the sandbox, credentials kept outside the sandbox, and agent evals.",
+   "why_you": "Your setup already quarantines untrusted pages and uses subagents, so the brain and hands split and credential-free sandbox ideas compare directly with your design. The preserved-thinking requirement could affect any harness of yours that compacts context."
+  },
+  {
+   "asked": false,
+   "confidence": "low",
+   "effort": "1h",
+   "fits": [
+    "Claude Code workflow",
+    "workflow kit"
+   ],
+   "flagged": true,
+   "id": "ca6564c73c",
+   "kind": "try",
+   "next_step": "Read the full release notes, then try the new write-blocking setting on a throwaway branch and compare its behaviour with your guard-run-scope hook before deciding whether it adds anything.",
+   "source": "claude-code-releases",
+   "source_name": "Claude Code releases",
+   "title": "Claude Code 2.1.314",
+   "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.314",
+   "what": "Claude Code 2.1.314 release notes (feed summary only). Adds a permissions setting that makes Write, Edit and NotebookEdit refuse paths outside the working directories in every permission mode. Adds idle compaction in VS Code and Desktop's Code tab for 200K+ token conversations. Fixes claude -p exiting 0 silently when startup fails.",
+   "why_you": "You rely on branch guards and run-scope hooks to keep scheduled runs inside their output folders. A built-in write restriction could back those up. The silent claude -p failure fix matters for your cloud scheduled tasks. Idle compaction touches your Desktop use."
+  }
+ ],
+ "date": "2026-10-30",
+ "opener": "A Claude Code release, a look at how Anthropic builds with Claude, and a Mistral open-weights drop: a decent Friday.",
+ "ranker": "claude",
+ "schema_version": 2,
+ "skim": [
+  {
+   "discussions": [
+    {
+     "comments": 402,
+     "name": "HN · 1527 points",
+     "points": 1527,
+     "url": "https://news.ycombinator.com/item?id=50289418"
+    }
+   ],
+   "id": "32c270bdcf",
+   "line": "Mistral releases the weights of Mistral Large 4 (HN front page).",
+   "link_name": "mistral.ai",
+   "source": "hn-front",
+   "source_name": "Hacker News",
+   "title": "We're releasing the weights of Mistral Large 4",
+   "url": "https://mistral.ai/news/mistral-large-4-oss/"
+  },
+  {
+   "discussions": [],
+   "id": "44a641f01a",
+   "line": "Hugging Face welcomes Mistral Large 4 on the Hub.",
+   "link_name": "Hugging Face blog",
+   "source": "hf-blog",
+   "source_name": "Hugging Face blog",
+   "title": "Welcome Le Chonk: Mistral Large 4 on Hugging Face",
+   "url": "https://huggingface.co/blog/mistral-large4"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 2,
+     "name": "HN · 41 points",
+     "points": 41,
+     "url": "https://news.ycombinator.com/item?id=50302334"
+    }
+   ],
+   "id": "68db500dd2",
+   "line": "HN thread titled 'Backdoors in official Claude Code extensions'; no further detail in the item.",
+   "link_name": "cyberplace.social",
+   "source": "hn-front",
+   "source_name": "Hacker News",
+   "title": "Backdoors in official Claude Code extensions",
+   "url": "https://cyberplace.social/@GossiTheDog/117528831681803563"
+  },
+  {
+   "discussions": [],
+   "id": "2075f47fc4",
+   "line": "Simon Willison points to a piece by Jacob Sansbury on building Spawn, calling it an exploration of agentic engineering against frontier models.",
+   "link_name": "Simon Willison",
+   "source": "simon-willison",
+   "source_name": "Simon Willison",
+   "title": "Building a multiplayer game world with autonomous Fable-class models",
+   "url": "https://simonwillison.net/2026/Oct/29/how-i-built-the-most-ai-pilled-company-in-the-world/"
+  },
+  {
+   "discussions": [
+    {
+     "comments": 126,
+     "name": "HN · 118 points",
+     "points": 118,
+     "url": "https://news.ycombinator.com/item?id=50292727"
+    }
+   ],
+   "id": "82bb59db8c",
+   "line": "HN discussion: Claude Duet, described as the first personal-assistant-type harness that feels useful.",
+   "link_name": "fig.blue",
+   "source": "hn-keywords",
+   "source_name": "Hacker News",
+   "title": "Claude Duet is the first personal-assistant-type harness that feels useful",
+   "url": "https://fig.blue/posts/duet-is-the-future/"
+  },
+  {
+   "discussions": [],
+   "id": "c24505f6d8",
+   "line": "arXiv paper assessing SWE-bench-style datasets with a self-evolving agent.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "Well-Specified and Well-Tested? Assessing SWE-bench-Style Datasets with a Self-Evolving Agent",
+   "url": "https://arxiv.org/abs/2610.39417"
+  },
+  {
+   "discussions": [],
+   "id": "91d8f2c6d4",
+   "line": "arXiv paper on scaling long-horizon coding via interdependent specifications.",
+   "link_name": "arXiv",
+   "source": "arxiv",
+   "source_name": "arXiv",
+   "title": "When Requirements Interact: Scaling Long-Horizon Coding via Interdependent Specifications",
+   "url": "https://arxiv.org/abs/2610.40256"
+  }
+ ],
+ "stats": {
+  "baseline": [],
+  "candidates": 51,
+  "failed": [
+   {
+    "error": "HTTP 429",
+    "id": "reddit",
+    "name": "Reddit"
+   }
+  ],
+  "quiet": [],
+  "sources_ok": 23,
+  "sources_total": 24
+ },
+ "title": "☕ Tech Digest — Fri 30 Oct 2026",
+ "tools": [],
+ "top": [
+  {
+   "discussions": [],
+   "headline": "Claude Code 2.1.314 adds write blocking and idle compaction",
+   "id": "ca6564c73c",
+   "link_name": "Claude Code releases",
+   "source": "claude-code-releases",
+   "source_name": "Claude Code releases",
+   "summary": "Adds permissions.blockWritesOutsideWorkingDirectories, so Write, Edit and NotebookEdit refuse paths outside the working directories in every permission mode. Idle compaction arrives in VS Code and Claude Desktop's Code tab: a conversation of 200K+ tokens left idle is summarized, and the summary is used on your next message if the prompt cache has expired. Also adds gateway group routing and fixes several failures.",
+   "title": "Claude Code 2.1.314",
+   "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.314",
+   "why": "Context compaction and permission behaviour are at the top of your Claude Code list, and the write-blocking setting touches how safely scheduled runs can be scoped."
+  },
+  {
+   "discussions": [],
+   "headline": "How Anthropic ships Claude with Claude: separating the brain from the hands",
+   "id": "502fe37057",
+   "link_name": "Latent Space",
+   "source": "latent-space",
+   "source_name": "Latent Space",
+   "summary": "A Latent Space episode with Katelyn Lesse and Angela Jiang on Opus 5.5, the Claude Platform, and the engineering behind AI agents.",
+   "title": "How Anthropic ships Claude with Claude: Separating the Brain from the Hands",
+   "url": "https://latent.space/p/opus55/",
+   "why": "Agent harness design from the people building the platform fits your first and second interests."
+  },
+  {
+   "discussions": [],
+   "headline": "OpenAI adds API credits for eligible ChatGPT subscriptions",
+   "id": "e05989bb27",
+   "link_name": "Simon Willison",
+   "source": "simon-willison",
+   "source_name": "Simon Willison",
+   "summary": "Simon Willison notes that earlier this month Anthropic announced a benefit for its Max and Team subscriptions: $100, $200 and $500 per month subscribers get an equivalent amount of expiring API credits. OpenAI now has a similar benefit for eligible ChatGPT subscriptions.",
+   "title": "API credits benefit for eligible ChatGPT subscriptions",
+   "url": "https://simonwillison.net/2026/Oct/29/api-credits/",
+   "why": "A pricing move that touches the Anthropic API credits you may already be entitled to, which is on your model pricing list."
+  }
+ ]
+}
