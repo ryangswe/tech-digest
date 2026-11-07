@@ -32,10 +32,10 @@ and writes `digest/YYYY-MM-DD.md`; a GitHub Action delivers it as an issue. The 
 ## Working agreements
 
 - **Never change files on the default branch** (`main`/`master`). Branch first
-  (`git checkout -b <slug>`). `.claude/hooks/guard-default-branch.py` blocks Edit/Write there as
-  a backstop, but cannot see shell writes (`sed -i`, `>>`). Scheduled runs push to
-  `claude/digest-YYYY-MM-DD` or `claude/interests-YYYY-MM-DD`; only the delivery Action writes
-  `main`, and only `digest/` and `state/`.
+  (`git checkout -b <slug>`). `.claude/hooks/guard-default-branch.py` blocks edits, `git commit`
+  and pushes to it as a backstop, but does not judge other shell writes (`sed -i`, `>>`).
+  Scheduled runs push to `claude/digest-YYYY-MM-DD` or `claude/interests-YYYY-MM-DD`; only the
+  delivery Action writes `main`, and only `digest/` and `state/`.
 - Stage explicit paths; never `git add .` or a whole directory.
 - **Standard library only.** No pip, no third-party packages, in the package or the tests.
 - **No claims beyond the source.** Digest text may only restate what the fetched item says; links
@@ -50,6 +50,12 @@ and writes `digest/YYYY-MM-DD.md`; a GitHub Action delivers it as an issue. The 
 - Record decisions a later session could plausibly reopen (direction, architecture, contracts,
   security, rejected alternatives): one line in the auto-loaded index @docs/decisions.md and the
   full entry in its `docs/decisions/<theme>.md`. The index header sets the format and budget.
+- **Size the task first, and say which lane in one line.** A *small change* (a few files, easy to
+  revert, and no change to a shared contract, security or privacy posture, or product behaviour)
+  takes the short lane: branch, change, `/checkpoint`, one `reviewer` pass, then a pull request
+  whose description ends with a `Decision:` line if one was made. No plan, no decisions-record
+  entry, no closeout. Anything bigger, or a small change that grows, takes the full process.
+  A `Decision:` line is promoted to the decisions record only if a later session could reopen it.
 - `CLAUDE.md` loads in every session and is capped at 14 KB by the workflow check. Always-on text
   is for a rule every session needs; add some only by cutting some. Procedures go in a skill, area
   rules in `.claude/rules/` with a `paths:` header.
@@ -70,6 +76,11 @@ and writes `digest/YYYY-MM-DD.md`; a GitHub Action delivers it as an issue. The 
   patching and ask the `reviewer` agent for a root-cause read before a third attempt.
 - Before declaring non-trivial work done, run the `reviewer` agent with fresh context on the task
   and the diff. Passing tests are not proof. Fix the material findings, re-run the checks.
+- Ending a session mid-task, switching topic, or past ~300–400k tokens: run `/handoff` (the
+  `handoff` skill). It records state in the repository and prints a short prompt for the next
+  session. Don't let a conversation be the only place work's state lives.
+- Weekly, at a handoff, or when `.claude/worktrees/` piles up: run `/gc` (the `gc` skill) to remove
+  worktrees and branches whose work is already in the default branch.
 - For lookups, use the `Explore` agent (cheap, read-only) rather than reading large files yourself.
 
 <!-- Workflow kit (light). `workflow-kit sync` updates the managed files under .claude/; this file
