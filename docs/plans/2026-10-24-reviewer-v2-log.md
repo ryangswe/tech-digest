@@ -42,3 +42,30 @@
     tested; wiring it into `.claude/settings.json` is the owner's call. Side channels closed;
     flags reduced to a boolean.
   - **Permanent decision record needed:** Yes (the quarantine entry is updated)
+
+- **2026-10-26 — T7: the X archive has no bookmarks**
+  - **Evidence:** the archive requested on 2026-10-24 (manifest and file list) holds likes, posts,
+    DMs and account data, but no bookmark file. X leaves bookmarks out of the download.
+  - **Impact:** `backlog import` had nothing to read; the X API route is paid and returns only
+    the most recent 800 bookmarks.
+  - **Resolution:** the owner chose the free twitter-web-exporter userscript. `backlog import`
+    now reads its JSON (full text of long posts, real link targets from "Include all metadata",
+    quoted posts, retweets) and warns when metadata is missing or the file is not a Bookmarks
+    export.
+  - **Permanent decision record needed:** No (a one-off input format)
+
+- **2026-11-23 — T7: the owner's own capture script replaces twitter-web-exporter**
+  - **Evidence:** the owner prefers not to run a third-party userscript in their signed-in X
+    session, and bookmarks come from two accounts.
+  - **Impact:** the backlog needs an input the owner can read in full, and rows must say which
+    account bookmarked them.
+  - **Resolution:** `tools/x-bookmarks-capture.js` keeps the Bookmarks responses X's page loads
+    while the owner scrolls by hand and saves one file per account; it sends nothing and drives
+    nothing. `backlog import` reads a folder of these files, tags each row with its account,
+    merges posts across accounts, and reports per-file counts (posts, deleted posts, unrecovered
+    failures, first page, end reached) so the owner can check them. It also fixes a bug on main:
+    a post saved twice that had been merged into another by its link was added to `also` twice.
+    Missed by: no test imported the same link-merged post twice; added one that also covers two
+    accounts. Instructions are in `docs/x-bookmarks.md`. The
+    twitter-web-exporter reader stays. Built on branch `backlog-web-exporter` (fed3e57).
+  - **Permanent decision record needed:** Yes (architecture: how bookmarks are captured)

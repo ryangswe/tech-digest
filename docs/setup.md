@@ -100,6 +100,9 @@ record a baseline. From the second day, only new items appear.
   extensions): paste the URL, set `"enabled": true`, add the host to step 2's list, and add a
   fixture in `fixtures/build.py` (a test checks every enabled source has one).
 - **Edit `interests.md`** whenever you like. The weekly run proposes changes as a PR.
+- **Export your X bookmarks** for the backlog triage (X's own data download leaves them out).
+  `docs/x-bookmarks.md` explains how to save them with `tools/x-bookmarks-capture.js`, one file
+  per account, into `~/Downloads/x-bookmarks/`. Then ask a local session to run the triage.
 - **Running locally on this Mac**: the python.org Python has no CA certificates, so run
   `/Applications/Python\ 3.10/Install\ Certificates.command` once, or prefix commands with
   `SSL_CERT_FILE=/etc/ssl/cert.pem`. The One Piece TCG site still fails locally with the macOS
