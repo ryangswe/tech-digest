@@ -5,6 +5,30 @@ Full rationale for this theme's decisions, newest first. The lean, auto-loaded i
 
 ---
 
+## 2026-11-23 — X bookmarks come from the owner's own passive capture script, scrolled by hand; no automation of the X session, no third-party userscript, no paid API
+
+**Status:** live, indexed
+
+**Context.** X's data download has no bookmarks, and the X API that returns them is paid (and
+returns only the latest 800). The free twitter-web-exporter userscript works, but it is a large
+third-party script running in the owner's signed-in session. The owner has two accounts.
+
+**Decision.** `tools/x-bookmarks-capture.js`, short enough to read in full, keeps copies of the
+Bookmarks GraphQL responses X's own page receives while the owner scrolls by hand, and saves one
+JSON file per account. It sends no requests, loads no code and never scrolls or clicks; a test
+checks for those calls and runs the script against a fake browser. No agent drives the owner's X
+session, and nothing works around X's rate limits. The instructions say plainly that X's terms
+restrict scraping, so whether to use it is the owner's call. `backlog import` reads the files,
+tags rows with the account and merges posts across accounts. Raw captures stay out of the
+repository like other raw bookmark text.
+
+**Rejected.** Paid exporters and the X API (cost, an API key, the 800 cap); twitter-web-exporter
+as the main route (too much third-party code to read; its reader stays for old exports); an
+agent scrolling the page through browser automation (drives the owner's session, and would be
+automated scraping); an auto-scrolling script (same reason).
+
+---
+
 ## 2026-10-24 — Untrusted page and bookmark text is read only by Read/Write-only subagents; their output reaches the owner only through code validation
 
 **Status:** live, indexed

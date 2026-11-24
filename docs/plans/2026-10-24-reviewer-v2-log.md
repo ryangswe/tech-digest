@@ -53,3 +53,16 @@
     quoted posts, retweets) and warns when metadata is missing or the file is not a Bookmarks
     export.
   - **Permanent decision record needed:** No (a one-off input format)
+
+- **2026-11-23 — T7: the owner's own capture script replaces twitter-web-exporter**
+  - **Evidence:** the owner prefers not to run a third-party userscript in their signed-in X
+    session, and bookmarks come from two accounts.
+  - **Impact:** the backlog needs an input the owner can read in full, and rows must say which
+    account bookmarked them.
+  - **Resolution:** `tools/x-bookmarks-capture.js` keeps the Bookmarks responses X's page loads
+    while the owner scrolls by hand and saves one file per account; it sends nothing and drives
+    nothing. `backlog import` reads a folder of these files, tags each row with its account,
+    merges posts across accounts, and reports per-file counts (posts, deleted posts, first page,
+    end reached) so the owner can check them. Instructions are in `docs/x-bookmarks.md`. The
+    twitter-web-exporter reader stays. Built on branch `backlog-web-exporter` (fed3e57).
+  - **Permanent decision record needed:** Yes (architecture: how bookmarks are captured)

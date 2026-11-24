@@ -2,9 +2,10 @@
 
     backlog import <archive.zip | folder | export.json>  -> backlog/raw/items.json  (gitignored)
 
-X's own archive leaves bookmarks out, so the usual input is a JSON export from the
-twitter-web-exporter userscript (Bookmarks module, "Include all metadata" ticked); the X archive's
-bookmark.js and X API bookmark pages are read too.
+X's own archive leaves bookmarks out, so the usual input is the file that
+`tools/x-bookmarks-capture.js` saves (see docs/x-bookmarks.md), one per account; a folder of them
+imports as one backlog, each row tagged with the account that bookmarked it. JSON from the
+twitter-web-exporter userscript, the X archive's bookmark.js and X API bookmark pages are read too.
     backlog read                            -> backlog/raw/reads/       (linked pages, untrusted)
     backlog batches [--size 40]             -> backlog/raw/batches/batch-NNN.json (id lists)
       (triage subagents, tools Read+Write)  -> backlog/triage/batch-NNN.json
@@ -143,37 +144,43 @@ def _graphql_parts(t: dict) -> tuple[str, str, list[str]]:
     return author, text, list(dict.fromkeys(urls))
 
 
-def _exporter_date(rec: dict, t: dict | None) -> str | None:
-    raw = (t or {}).get("legacy", {}).get("created_at")  # "Wed Oct 10 20:19:24 +0000 2018"
-    if raw:
-        try:
-            return datetime.strptime(raw, "%a %b %d %H:%M:%S %z %Y").date().isoformat()
-        except ValueError:
-            pass
-    m = re.match(r"^(\d{4}-\d{2}-\d{2})", str(rec.get("created_at") or ""))  # its default format
-    return m.group(1) if m else None
+def _graphql_date(t: dict) -> str | None:
+    raw = t["legacy"].get("created_at")  # "Wed Oct 10 20:19:24 +0000 2018"
+    try:
+        return datetime.strptime(raw, "%a %b %d %H:%M:%S %z %Y").date().isoformat() if raw else None
+    except ValueError:
+        return None
+
+
+def _graphql_row(t: dict, fallback_id: str) -> dict:
+    """A row from one web-API post. A retweet is read as the post it shares; a quoted post follows."""
+    if isinstance((t["legacy"].get("retweeted_status_result") or {}).get("result"), dict):
+        t = _graphql_tweet(t["legacy"]["retweeted_status_result"]["result"]) or t  # the original
+    author, text, urls = _graphql_parts(t)
+    quoted = _graphql_tweet((t.get("quoted_status_result") or {}).get("result"))
+    if quoted:  # the post it quotes is part of what was saved; its links come after the post's own
+        q_author, q_text, q_urls = _graphql_parts(quoted)
+        text += f"\n\n[Quoting @{q_author}] {q_text[:QUOTED_CHARS]}"
+        urls += [u for u in q_urls if u not in urls]
+    tid = str(t.get("rest_id") or t["legacy"].get("id_str") or "")
+    return {"tweet_id": tid if tid.isdigit() else fallback_id, "text": text.strip(), "author": author,
+            "created": _graphql_date(t), "urls": urls}
 
 
 def _norm_web_export(rec: dict) -> dict | None:
     if not isinstance(rec, dict) or not str(rec.get("id") or "").isdigit():
         return None
     t = _graphql_tweet(rec.get("metadata"))
-    if t and isinstance((t["legacy"].get("retweeted_status_result") or {}).get("result"), dict):
-        t = _graphql_tweet(t["legacy"]["retweeted_status_result"]["result"]) or t  # the original
     if t:
-        author, text, urls = _graphql_parts(t)
-        quoted = _graphql_tweet((t.get("quoted_status_result") or {}).get("result"))
-        if quoted:  # the post it quotes is part of what was saved; its links come after the post's own
-            q_author, q_text, q_urls = _graphql_parts(quoted)
-            text += f"\n\n[Quoting @{q_author}] {q_text[:QUOTED_CHARS]}"
-            urls += [u for u in q_urls if u not in urls]
-        tid = str(t.get("rest_id") or t["legacy"].get("id_str") or rec["id"])
+        row = _graphql_row(t, str(rec["id"]))
     else:  # exported without "Include all metadata": only the t.co links in the text
-        author, text = rec.get("screen_name") or "", rec.get("full_text") or ""
-        urls, tid = re.findall(r"https?://\S+", text), str(rec["id"])
-    return {"tweet_id": tid if tid.isdigit() else str(rec["id"]), "text": text.strip(), "author": author,
-            "created": _exporter_date(rec, t), "urls": urls, "_metadata": bool(t),
-            "_bookmarked": rec.get("bookmarked")}
+        text = rec.get("full_text") or ""
+        row = {"tweet_id": str(rec["id"]), "text": text.strip(), "author": rec.get("screen_name") or "",
+               "created": None, "urls": re.findall(r"https?://\S+", text)}
+    if not row["created"]:
+        m = re.match(r"^(\d{4}-\d{2}-\d{2})", str(rec.get("created_at") or ""))  # its default format
+        row["created"] = m.group(1) if m else None
+    return {**row, "_metadata": bool(t), "_bookmarked": rec.get("bookmarked")}
 
 
 def _web_export_warnings(rows: list[dict]) -> list[str]:
@@ -187,18 +194,88 @@ def _web_export_warnings(rows: list[dict]) -> list[str]:
     return out
 
 
+# --- tools/x-bookmarks-capture.js (the owner's own capture of the Bookmarks page) -------------
+
+CAPTURE_FORMAT = "tech-digest/x-bookmarks-capture"
+HANDLE = re.compile(r"^[A-Za-z0-9_]{1,15}$")
+
+
+def _is_capture(data) -> bool:
+    return isinstance(data, dict) and data.get("format") == CAPTURE_FORMAT
+
+
+def _post_entries(node):
+    """(entry key, entry) for each bookmarked post, wherever X nests it: a timeline entry
+    ("tweet-<id>") holding tweet_results. The key matches the browser script's count."""
+    if isinstance(node, list):
+        for n in node:
+            yield from _post_entries(n)
+    elif isinstance(node, dict):
+        content = node.get("content") if isinstance(node.get("entryId"), str) else None
+        if isinstance(content, dict) and "tweet_results" in (content.get("itemContent") or {}):
+            yield node["entryId"].removeprefix("tweet-"), node
+        else:
+            for v in node.values():
+                yield from _post_entries(v)
+
+
+def _capture_rows(data: dict, name: str) -> tuple[list[dict], dict, list[str]]:
+    """(rows, a summary of the capture, warnings) for one saved capture file."""
+    if data.get("version") != 1:
+        raise BacklogError(f"{name}: capture version {data.get('version')!r}; this import reads version 1")
+    account = str(data.get("account") or "").removeprefix("@")
+    pages = [p for p in (data.get("pages") or []) if isinstance(p, dict)]
+    ok = [p for p in pages if p.get("status") == 200 and isinstance(p.get("body"), dict)
+          and p["body"].get("data")]
+    rows, seen, unavailable = [], set(), 0
+    posts_per_page = []
+    for p in ok:
+        entries = list(_post_entries(p["body"]))
+        posts_per_page.append(len(entries))
+        for entry_id, entry in entries:
+            if entry_id in seen:  # the same page arrives twice when X reloads it
+                continue
+            seen.add(entry_id)
+            result = ((((entry.get("content") or {}).get("itemContent") or {}).get("tweet_results") or {})
+                      .get("result"))
+            t = _graphql_tweet(result)
+            if not t:  # deleted, suspended or protected since it was bookmarked
+                unavailable += 1
+                continue
+            rows.append({**_graphql_row(t, entry_id), "account": account or None})
+    summary = {"file": name, "account": account or None, "pages": len(pages), "posts": len(seen),
+               "unavailable": unavailable, "failed_pages": len(pages) - len(ok),
+               "first_page": any(p.get("cursor") is None for p in ok),
+               "ended_on_empty_page": bool(posts_per_page) and posts_per_page[-1] == 0}
+    warnings = []
+    if not HANDLE.match(account):
+        warnings.append(f"{name}: no valid account name, so its rows can't be told apart by account. "
+                        "Save the capture again and enter the handle.")
+    if ok and not summary["first_page"]:
+        warnings.append(f"{name}: the first page (your newest bookmarks) is missing. Follow the "
+                        "first-page step in docs/x-bookmarks.md and save again.")
+    if summary["failed_pages"]:
+        warnings.append(f"{name}: {summary['failed_pages']} of {len(pages)} responses failed (X may be "
+                        "limiting requests). Wait, scroll again and save again.")
+    return rows, summary, warnings
+
+
 def parse_archive(path: Path) -> tuple[list[dict], dict]:
-    """Bookmarks from an X archive (zip or folder), X API bookmark pages, or a
+    """Bookmarks from capture files, an X archive (zip or folder), X API bookmark pages, or a
     twitter-web-exporter JSON file (or a folder holding any of these)."""
     files = _archive_files(path)
-    found, notes = [], {"files": [], "warnings": []}
+    found, notes = [], {"files": [], "warnings": [], "captures": []}
     for name, text in files.items():
         base = name.rsplit("/", 1)[-1].lower()
         try:
             data = _js_payload(text)
         except (json.JSONDecodeError, ValueError):
             continue
-        if _is_web_export(data):
+        if _is_capture(data):
+            rows, summary, warnings = _capture_rows(data, name)
+            notes["captures"].append(summary)
+            notes["warnings"] += warnings
+        elif _is_web_export(data):
             rows = [r for r in (_norm_web_export(o) for o in data) if r]
             if rows:
                 notes["warnings"] += [f"{name}: {w}" for w in _web_export_warnings(rows)]
@@ -234,21 +311,31 @@ def _primary_link(urls: list[str]) -> str | None:
 
 
 def normalise(rows: list[dict]) -> tuple[dict[str, dict], dict]:
-    """Dedupe (same post, or same linked page) into {id: item}; plus counts for the summary."""
+    """Dedupe (same post, or same linked page, across accounts too) into {id: item}; plus counts.
+    Each item lists the accounts that bookmarked it or a post merged into it."""
     items: dict[str, dict] = {}
     by_link: dict[str, str] = {}
+    by_post: dict[str, str] = {}  # post id -> the item it went into
+    accounts_of: dict[str, set[str]] = defaultdict(set)  # post id -> accounts that bookmarked it
     dupes = 0
     for r in rows:
+        account = r.get("account")
+        if account:
+            accounts_of[r["tweet_id"]].add(account)
+        merged_into = by_post.get(r["tweet_id"])
+        if not merged_into:
+            link = _primary_link(r["urls"])
+            key = canonical_key(link) if link else None
+            merged_into = by_link.get(key) if key else None
+            if merged_into:  # several bookmarks of the same article: one item
+                items[merged_into]["also"].append(r["tweet_id"])
+                by_post[r["tweet_id"]] = merged_into
+        if merged_into:
+            dupes += 1
+            if account and account not in items[merged_into]["accounts"]:
+                items[merged_into]["accounts"] = sorted([*items[merged_into]["accounts"], account])
+            continue
         iid = _item_id(r["tweet_id"])
-        if iid in items:
-            dupes += 1
-            continue
-        link = _primary_link(r["urls"])
-        key = canonical_key(link) if link else None
-        if key and key in by_link:  # several bookmarks of the same article: one item
-            items[by_link[key]]["also"].append(r["tweet_id"])
-            dupes += 1
-            continue
         post_url = f"https://x.com/{r['author'] or 'i/web'}/status/{r['tweet_id']}"
         text = re.sub(r"\s*https://t\.co/\S+", "", r["text"]).strip()
         items[iid] = {
@@ -258,8 +345,9 @@ def normalise(rows: list[dict]) -> tuple[dict[str, dict], dict]:
             "source_name": f"@{r['author']}" if r["author"] else "X bookmark",
             "link_name": urlsplit(link).hostname.removeprefix("www.") if link else "X",
             "title": (text[:90] + "…") if len(text) > 90 else (text or "(no text)"),
-            "summary": text,
+            "summary": text, "accounts": [account] if account else [],
         }
+        by_post[r["tweet_id"]] = iid
         if key:
             by_link[key] = iid
     vals = list(items.values())
@@ -269,7 +357,9 @@ def normalise(rows: list[dict]) -> tuple[dict[str, dict], dict]:
              "with_text": sum(1 for i in vals if i["text"]), "ids_only": sum(1 for i in vals if not i["text"]),
              "with_link": sum(1 for i in vals if i["url"] != i["post_url"]),
              "top_link_hosts": hosts.most_common(12),
-             "date_range": [dates[0], dates[-1]] if dates else None}
+             "date_range": [dates[0], dates[-1]] if dates else None,
+             "posts_by_account": dict(sorted(Counter(a for s in accounts_of.values() for a in s).items())),
+             "posts_in_several_accounts": sum(1 for s in accounts_of.values() if len(s) > 1)}
     return items, stats
 
 
@@ -280,6 +370,8 @@ def import_archive(path: Path, root: Path = Path("backlog")) -> dict:
     raw.mkdir(parents=True, exist_ok=True)
     (raw / "items.json").write_text(json.dumps(items, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     stats["files"] = notes["files"]
+    if notes["captures"]:
+        stats["captures"] = notes["captures"]
     warnings = list(notes["warnings"])
     if stats["items"] and stats["ids_only"] > 0.5 * stats["items"]:
         warnings.append("most bookmarks have no text (the archive holds only ids): triage would "

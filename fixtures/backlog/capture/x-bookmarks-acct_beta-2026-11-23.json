@@ -1,0 +1,208 @@
+{
+ "format": "tech-digest/x-bookmarks-capture",
+ "version": 1,
+ "account": "acct_beta",
+ "saved_at": "2026-11-23T18:00:00.000Z",
+ "posts_seen": 0,
+ "first_page": true,
+ "pages": [
+  {
+   "cursor": null,
+   "status": 200,
+   "body": {
+    "data": {
+     "bookmark_timeline_v2": {
+      "timeline": {
+       "instructions": [
+        {
+         "type": "TimelineAddEntries",
+         "entries": [
+          {
+           "entryId": "tweet-3100000000000000001",
+           "sortIndex": "3100000000000000001",
+           "content": {
+            "entryType": "TimelineTimelineItem",
+            "__typename": "TimelineTimelineItem",
+            "itemContent": {
+             "itemType": "TimelineTweet",
+             "__typename": "TimelineTweet",
+             "tweet_results": {
+              "result": {
+               "__typename": "Tweet",
+               "rest_id": "3100000000000000001",
+               "core": {
+                "user_results": {
+                 "result": {
+                  "__typename": "User",
+                  "rest_id": "7",
+                  "core": {
+                   "screen_name": "fixture_dev",
+                   "name": "fixture_dev"
+                  }
+                 }
+                }
+               },
+               "legacy": {
+                "id_str": "3100000000000000001",
+                "full_text": "Notes on reviewer agents https://t.co/x",
+                "created_at": "Tue Nov 03 02:00:00 +0000 2026",
+                "bookmarked": true,
+                "entities": {
+                 "urls": [
+                  {
+                   "url": "https://t.co/x",
+                   "expanded_url": "https://example.org/reviewers?utm_source=twitter"
+                  }
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          },
+          {
+           "entryId": "tweet-3100000000000000007",
+           "sortIndex": "3100000000000000007",
+           "content": {
+            "entryType": "TimelineTimelineItem",
+            "__typename": "TimelineTimelineItem",
+            "itemContent": {
+             "itemType": "TimelineTweet",
+             "__typename": "TimelineTweet",
+             "tweet_results": {
+              "result": {
+               "__typename": "Tweet",
+               "rest_id": "3100000000000000007",
+               "core": {
+                "user_results": {
+                 "result": {
+                  "__typename": "User",
+                  "rest_id": "7",
+                  "core": {
+                   "screen_name": "other_fixture",
+                   "name": "other_fixture"
+                  }
+                 }
+                }
+               },
+               "legacy": {
+                "id_str": "3100000000000000007",
+                "full_text": "Same article https://t.co/x",
+                "created_at": "Mon Nov 02 15:00:00 +0000 2026",
+                "bookmarked": true,
+                "entities": {
+                 "urls": [
+                  {
+                   "url": "https://t.co/x",
+                   "expanded_url": "https://example.org/reviewers?utm_source=newsletter"
+                  }
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          },
+          {
+           "entryId": "tweet-3100000000000000008",
+           "sortIndex": "3100000000000000008",
+           "content": {
+            "entryType": "TimelineTimelineItem",
+            "__typename": "TimelineTimelineItem",
+            "itemContent": {
+             "itemType": "TimelineTweet",
+             "__typename": "TimelineTweet",
+             "tweet_results": {
+              "result": {
+               "__typename": "Tweet",
+               "rest_id": "3100000000000000008",
+               "core": {
+                "user_results": {
+                 "result": {
+                  "__typename": "User",
+                  "rest_id": "7",
+                  "core": {
+                   "screen_name": "beta_fixture",
+                   "name": "beta_fixture"
+                  }
+                 }
+                }
+               },
+               "legacy": {
+                "id_str": "3100000000000000008",
+                "full_text": "Sandboxing agents https://t.co/x",
+                "created_at": "Sun Oct 04 09:00:00 +0000 2026",
+                "bookmarked": true,
+                "entities": {
+                 "urls": [
+                  {
+                   "url": "https://t.co/x",
+                   "expanded_url": "https://example.org/sandboxing"
+                  }
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          },
+          {
+           "entryId": "cursor-top-1",
+           "content": {
+            "cursorType": "Top",
+            "value": "top1"
+           }
+          },
+          {
+           "entryId": "cursor-bottom-1",
+           "content": {
+            "cursorType": "Bottom",
+            "value": "c1"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "cursor": "c1",
+   "status": 200,
+   "body": {
+    "data": {
+     "bookmark_timeline_v2": {
+      "timeline": {
+       "instructions": [
+        {
+         "type": "TimelineAddEntries",
+         "entries": [
+          {
+           "entryId": "cursor-top-2",
+           "content": {
+            "cursorType": "Top",
+            "value": "top2"
+           }
+          },
+          {
+           "entryId": "cursor-bottom-2",
+           "content": {
+            "cursorType": "Bottom",
+            "value": "c2"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     }
+    }
+   }
+  }
+ ]
+}

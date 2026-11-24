@@ -1,0 +1,408 @@
+{
+ "format": "tech-digest/x-bookmarks-capture",
+ "version": 1,
+ "account": "acct_alpha",
+ "saved_at": "2026-11-23T18:00:00.000Z",
+ "posts_seen": 0,
+ "first_page": true,
+ "pages": [
+  {
+   "cursor": null,
+   "status": 200,
+   "body": {
+    "data": {
+     "bookmark_timeline_v2": {
+      "timeline": {
+       "instructions": [
+        {
+         "type": "TimelineAddEntries",
+         "entries": [
+          {
+           "entryId": "tweet-3100000000000000001",
+           "sortIndex": "3100000000000000001",
+           "content": {
+            "entryType": "TimelineTimelineItem",
+            "__typename": "TimelineTimelineItem",
+            "itemContent": {
+             "itemType": "TimelineTweet",
+             "__typename": "TimelineTweet",
+             "tweet_results": {
+              "result": {
+               "__typename": "Tweet",
+               "rest_id": "3100000000000000001",
+               "core": {
+                "user_results": {
+                 "result": {
+                  "__typename": "User",
+                  "rest_id": "7",
+                  "core": {
+                   "screen_name": "fixture_dev",
+                   "name": "fixture_dev"
+                  }
+                 }
+                }
+               },
+               "legacy": {
+                "id_str": "3100000000000000001",
+                "full_text": "Notes on reviewer agents https://t.co/x",
+                "created_at": "Tue Nov 03 02:00:00 +0000 2026",
+                "bookmarked": true,
+                "entities": {
+                 "urls": [
+                  {
+                   "url": "https://t.co/x",
+                   "expanded_url": "https://example.org/reviewers?utm_source=twitter"
+                  }
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          },
+          {
+           "entryId": "tweet-3100000000000000002",
+           "sortIndex": "3100000000000000002",
+           "content": {
+            "entryType": "TimelineTimelineItem",
+            "__typename": "TimelineTimelineItem",
+            "itemContent": {
+             "itemType": "TimelineTweet",
+             "__typename": "TimelineTweet",
+             "tweet_results": {
+              "result": {
+               "__typename": "TweetWithVisibilityResults",
+               "tweet": {
+                "__typename": "Tweet",
+                "rest_id": "3100000000000000002",
+                "core": {
+                 "user_results": {
+                  "result": {
+                   "__typename": "User",
+                   "rest_id": "7",
+                   "core": {
+                    "screen_name": "limited_fixture",
+                    "name": "limited_fixture"
+                   }
+                  }
+                 }
+                },
+                "legacy": {
+                 "id_str": "3100000000000000002",
+                 "full_text": "A lint for skills https://t.co/x",
+                 "created_at": "Mon Nov 02 15:00:00 +0000 2026",
+                 "bookmarked": true,
+                 "entities": {
+                  "urls": [
+                   {
+                    "url": "https://t.co/x",
+                    "expanded_url": "https://github.com/example/skill-lint"
+                   }
+                  ]
+                 }
+                }
+               }
+              }
+             }
+            }
+           }
+          },
+          {
+           "entryId": "tweet-3100000000000000003",
+           "sortIndex": "3100000000000000003",
+           "content": {
+            "entryType": "TimelineTimelineItem",
+            "__typename": "TimelineTimelineItem",
+            "itemContent": {
+             "itemType": "TimelineTweet",
+             "__typename": "TimelineTweet",
+             "tweet_results": {
+              "result": {
+               "__typename": "TweetTombstone",
+               "tombstone": {
+                "text": {
+                 "text": "This post is unavailable."
+                }
+               }
+              }
+             }
+            }
+           }
+          },
+          {
+           "entryId": "cursor-top-1",
+           "content": {
+            "cursorType": "Top",
+            "value": "top1"
+           }
+          },
+          {
+           "entryId": "cursor-bottom-1",
+           "content": {
+            "cursorType": "Bottom",
+            "value": "c1"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "cursor": "c1",
+   "status": 200,
+   "body": {
+    "data": {
+     "bookmark_timeline_v2": {
+      "timeline": {
+       "instructions": [
+        {
+         "type": "TimelineAddEntries",
+         "entries": [
+          {
+           "entryId": "tweet-3100000000000000004",
+           "sortIndex": "3100000000000000004",
+           "content": {
+            "entryType": "TimelineTimelineItem",
+            "__typename": "TimelineTimelineItem",
+            "itemContent": {
+             "itemType": "TimelineTweet",
+             "__typename": "TimelineTweet",
+             "tweet_results": {
+              "result": {
+               "__typename": "Tweet",
+               "rest_id": "3100000000000000004",
+               "core": {
+                "user_results": {
+                 "result": {
+                  "__typename": "User",
+                  "rest_id": "7",
+                  "core": {
+                   "screen_name": "booster",
+                   "name": "booster"
+                  }
+                 }
+                }
+               },
+               "legacy": {
+                "id_str": "3100000000000000004",
+                "full_text": "RT @onnx_fixture: Running ONNX\u2026",
+                "created_at": "Mon Nov 02 15:00:00 +0000 2026",
+                "bookmarked": true,
+                "entities": {
+                 "urls": []
+                },
+                "retweeted_status_result": {
+                 "result": {
+                  "__typename": "Tweet",
+                  "rest_id": "3100000000000000005",
+                  "core": {
+                   "user_results": {
+                    "result": {
+                     "__typename": "User",
+                     "rest_id": "7",
+                     "core": {
+                      "screen_name": "onnx_fixture",
+                      "name": "onnx_fixture"
+                     }
+                    }
+                   }
+                  },
+                  "legacy": {
+                   "id_str": "3100000000000000005",
+                   "full_text": "Running ONNX in the browser https://t.co/x",
+                   "created_at": "Mon Nov 02 15:00:00 +0000 2026",
+                   "bookmarked": true,
+                   "entities": {
+                    "urls": [
+                     {
+                      "url": "https://t.co/x",
+                      "expanded_url": "https://example.org/onnx-webgpu"
+                     }
+                    ]
+                   }
+                  }
+                 }
+                }
+               }
+              }
+             }
+            }
+           }
+          },
+          {
+           "entryId": "tweet-3100000000000000006",
+           "sortIndex": "3100000000000000006",
+           "content": {
+            "entryType": "TimelineTimelineItem",
+            "__typename": "TimelineTimelineItem",
+            "itemContent": {
+             "itemType": "TimelineTweet",
+             "__typename": "TimelineTweet",
+             "tweet_results": {
+              "result": {
+               "__typename": "Tweet",
+               "rest_id": "3100000000000000006",
+               "core": {
+                "user_results": {
+                 "result": {
+                  "__typename": "User",
+                  "rest_id": "7",
+                  "core": {
+                   "screen_name": "fixture_dev",
+                   "name": "fixture_dev"
+                  }
+                 }
+                }
+               },
+               "legacy": {
+                "id_str": "3100000000000000006",
+                "full_text": "Worth a read",
+                "created_at": "Mon Nov 02 15:00:00 +0000 2026",
+                "bookmarked": true,
+                "entities": {
+                 "urls": []
+                }
+               },
+               "quoted_status_result": {
+                "result": {
+                 "__typename": "Tweet",
+                 "rest_id": "3100000000000000009",
+                 "core": {
+                  "user_results": {
+                   "result": {
+                    "__typename": "User",
+                    "rest_id": "7",
+                    "core": {
+                     "screen_name": "writer_fixture",
+                     "name": "writer_fixture"
+                    }
+                   }
+                  }
+                 },
+                 "legacy": {
+                  "id_str": "3100000000000000009",
+                  "full_text": "Our evals write-up https://t.co/x",
+                  "created_at": "Mon Nov 02 15:00:00 +0000 2026",
+                  "bookmarked": true,
+                  "entities": {
+                   "urls": [
+                    {
+                     "url": "https://t.co/x",
+                     "expanded_url": "https://example.org/evals"
+                    }
+                   ]
+                  }
+                 }
+                }
+               }
+              }
+             }
+            }
+           }
+          },
+          {
+           "entryId": "tweet-3100000000000000001",
+           "sortIndex": "3100000000000000001",
+           "content": {
+            "entryType": "TimelineTimelineItem",
+            "__typename": "TimelineTimelineItem",
+            "itemContent": {
+             "itemType": "TimelineTweet",
+             "__typename": "TimelineTweet",
+             "tweet_results": {
+              "result": {
+               "__typename": "Tweet",
+               "rest_id": "3100000000000000001",
+               "core": {
+                "user_results": {
+                 "result": {
+                  "__typename": "User",
+                  "rest_id": "7",
+                  "core": {
+                   "screen_name": "fixture_dev",
+                   "name": "fixture_dev"
+                  }
+                 }
+                }
+               },
+               "legacy": {
+                "id_str": "3100000000000000001",
+                "full_text": "Notes on reviewer agents https://t.co/x",
+                "created_at": "Tue Nov 03 02:00:00 +0000 2026",
+                "bookmarked": true,
+                "entities": {
+                 "urls": [
+                  {
+                   "url": "https://t.co/x",
+                   "expanded_url": "https://example.org/reviewers?utm_source=twitter"
+                  }
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          },
+          {
+           "entryId": "cursor-top-2",
+           "content": {
+            "cursorType": "Top",
+            "value": "top2"
+           }
+          },
+          {
+           "entryId": "cursor-bottom-2",
+           "content": {
+            "cursorType": "Bottom",
+            "value": "c2"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "cursor": "c2",
+   "status": 200,
+   "body": {
+    "data": {
+     "bookmark_timeline_v2": {
+      "timeline": {
+       "instructions": [
+        {
+         "type": "TimelineAddEntries",
+         "entries": [
+          {
+           "entryId": "cursor-top-3",
+           "content": {
+            "cursorType": "Top",
+            "value": "top3"
+           }
+          },
+          {
+           "entryId": "cursor-bottom-3",
+           "content": {
+            "cursorType": "Bottom",
+            "value": "c3"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     }
+    }
+   }
+  }
+ ]
+}

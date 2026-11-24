@@ -1,8 +1,10 @@
 import json
 import re
+import shutil
 import subprocess
 import unittest
 import zipfile
+from pathlib import Path
 
 from techdigest import backlog as B
 
@@ -143,6 +145,139 @@ class WebExporterTest(unittest.TestCase):
                                 str(FIX / "web-exporter-plain"), "--root", str(d)],
                                cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(r.returncode, 3)
+
+
+CAPTURE = FIX / "capture"
+ALPHA = CAPTURE / "x-bookmarks-acct_alpha-2026-11-23.json"
+
+
+def edited_capture(d, edit):
+    """A copy of alpha's capture file in folder d, changed by edit(data)."""
+    data = json.loads(ALPHA.read_text())
+    edit(data)
+    path = d / "x-bookmarks-edited.json"
+    path.write_text(json.dumps(data))
+    return path
+
+
+class CaptureTest(unittest.TestCase):
+    """Files saved by tools/x-bookmarks-capture.js, one per account (fixtures/backlog/make_capture.py)."""
+
+    def test_two_accounts_import_as_one_backlog(self):
+        with TempDir() as d:
+            stats = B.import_archive(CAPTURE, d)
+            items = json.loads((d / "raw/items.json").read_text())
+        self.assertNotIn("warning", stats)
+        self.assertEqual((stats["bookmarks"], stats["items"], stats["merged_duplicates"]), (7, 5, 2))
+        self.assertEqual(stats["posts_by_account"], {"acct_alpha": 4, "acct_beta": 3})
+        self.assertEqual(stats["posts_in_several_accounts"], 1)
+        shared = next(i for i in items.values() if i["tweet_id"] == "3100000000000000001")
+        # bookmarked by both accounts, and beta's other post on the same article merged into it
+        self.assertEqual(shared["accounts"], ["acct_alpha", "acct_beta"])
+        self.assertEqual(shared["also"], ["3100000000000000007"])
+        self.assertEqual(shared["url"], "https://example.org/reviewers")
+        own = next(i for i in items.values() if i["tweet_id"] == "3100000000000000008")
+        self.assertEqual(own["accounts"], ["acct_beta"])
+
+    def test_capture_summary_for_checking_counts(self):
+        _, notes = B.parse_archive(CAPTURE)
+        alpha = next(c for c in notes["captures"] if c["account"] == "acct_alpha")
+        # 5 posts, as the panel counted them: one is a deleted post, and a repeated entry counts once
+        self.assertEqual((alpha["pages"], alpha["posts"], alpha["unavailable"]), (3, 5, 1))
+        self.assertTrue(alpha["first_page"] and alpha["ended_on_empty_page"])
+        self.assertEqual(alpha["failed_pages"], 0)
+
+    def test_post_shapes(self):
+        rows, _ = B.parse_archive(ALPHA)
+        by_id = {r["tweet_id"]: r for r in rows}
+        self.assertEqual(sorted(by_id), ["3100000000000000001", "3100000000000000002",
+                                         "3100000000000000005", "3100000000000000006"])
+        self.assertEqual(len(rows), 4)  # the repeated entry is read once
+        self.assertEqual(by_id["3100000000000000002"]["author"], "limited_fixture")  # wrapped post
+        rt = by_id["3100000000000000005"]  # the retweet is read as the original post
+        self.assertEqual((rt["author"], rt["urls"]), ("onnx_fixture", ["https://example.org/onnx-webgpu"]))
+        quote = by_id["3100000000000000006"]
+        self.assertIn("[Quoting @writer_fixture] Our evals write-up", quote["text"])
+        self.assertEqual(quote["urls"], ["https://example.org/evals"])
+        self.assertEqual(by_id["3100000000000000001"]["created"], "2026-11-03")
+        self.assertTrue(all(r["account"] == "acct_alpha" for r in rows))
+
+    def test_warnings_for_an_incomplete_capture(self):
+        def edit(data):
+            data["account"] = ""
+            data["pages"][0]["cursor"] = "c0"  # the script started after the first page loaded
+            data["pages"].append({"cursor": "c3", "status": 429, "body": "Rate limit exceeded"})
+        with TempDir() as d:
+            stats = B.import_archive(edited_capture(d, edit), d / "out")
+        for words in ("no valid account name", "first page", "1 of 4 responses failed"):
+            self.assertIn(words, stats["warning"])
+        self.assertEqual(stats["posts_by_account"], {})
+
+    def test_newer_version_is_refused(self):
+        with TempDir() as d:
+            path = edited_capture(d, lambda data: data.update(version=2))
+            with self.assertRaises(B.BacklogError) as e:
+                B.parse_archive(path)
+        self.assertIn("version 2", str(e.exception))
+
+    def test_other_formats_have_no_accounts(self):
+        items, stats = B.normalise(B.parse_archive(FIX / "full")[0])
+        self.assertTrue(all(i["accounts"] == [] for i in items.values()))
+        self.assertEqual((stats["posts_by_account"], stats["posts_in_several_accounts"]), ({}, 0))
+
+
+SCRIPT = ROOT / "tools/x-bookmarks-capture.js"
+
+
+class CaptureScriptTest(unittest.TestCase):
+    """The browser script: read in full by the owner, so it must stay short and self-contained."""
+
+    def test_self_contained(self):
+        src = SCRIPT.read_text()
+        self.assertLess(len(src.splitlines()), 200)
+        code = "\n".join(l for l in src.splitlines() if not l.lstrip().startswith("//"))
+        for banned in ("import", "require(", "eval(", "Function(", "sendBeacon", "WebSocket", "EventSource",
+                       "Worker(", "innerHTML", "insertAdjacentHTML", "document.write", ".send(", "http://",
+                       "https://", "localStorage", "indexedDB", "createElement(\"script"):
+            self.assertNotIn(banned, code, banned)
+        self.assertIsNone(re.search(r"scroll(To|By|IntoView)|scrollTop|dispatchEvent", code))  # never drives the page
+        # the only fetch call passes the page's own request through
+        self.assertEqual(re.findall(r"\w*[Ff]etch\s*\(", code), [])
+        self.assertIn("realFetch.apply(this, arguments)", code)
+
+    def run_script(self, capture: Path) -> dict:
+        r = subprocess.run(["node", str(ROOT / "tests/capture_harness.js"), str(capture)],
+                           capture_output=True, text=True, timeout=30)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return json.loads(r.stdout)
+
+    @unittest.skipUnless(shutil.which("node"), "needs Node.js to run the browser script")
+    def test_saved_file_imports_like_the_fixture(self):
+        out = self.run_script(ALPHA)
+        self.assertEqual(out["other_seen"], 0)  # other requests are not kept
+        self.assertEqual(len(out["requests"]), 4)  # the page's own four, nothing added
+        self.assertRegex(out["download"], r"^x-bookmarks-acct_alpha-\d{4}-\d{2}-\d{2}\.json$")
+        self.assertIn("5 posts from 3 pages", out["panel"])
+        self.assertIn("First page: captured", out["panel"])
+        self.assertIn("this may be the end", out["panel"])
+        saved = out["saved"]
+        self.assertEqual((saved["account"], saved["posts_seen"], saved["first_page"]), ("acct_alpha", 5, True))
+        with TempDir() as d:
+            (d / "saved.json").write_text(json.dumps(saved))
+            rows, notes = B.parse_archive(d / "saved.json")
+        self.assertEqual(rows, B.parse_archive(ALPHA)[0])
+        self.assertEqual(notes["warnings"], [])
+
+    @unittest.skipUnless(shutil.which("node"), "needs Node.js to run the browser script")
+    def test_panel_shows_a_missed_first_page_and_failures(self):
+        def edit(data):
+            data["pages"][0]["cursor"] = "c0"
+            data["pages"].insert(1, {"cursor": "c1", "status": 429, "body": "Rate limit exceeded"})
+        with TempDir() as d:
+            out = self.run_script(edited_capture(d, edit))
+        self.assertIn("First page: missed", out["panel"])
+        self.assertIn("Failed responses: 1 (last status", out["panel"])
+        self.assertFalse(out["saved"]["first_page"])
 
 
 class RawStaysLocalTest(unittest.TestCase):
