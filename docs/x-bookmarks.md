@@ -34,8 +34,9 @@ call to make for your own account. X may read its terms differently from how we 
    x.com/home and start again from step 3.
 5. Scroll down through your bookmarks by hand, at your own pace. The post count grows each time X
    loads another page.
-6. At the bottom, X answers the request for the next page with an empty page. The panel then
-   says "X returned an empty page, so this is the end of the list," and the count stops growing.
+6. At the bottom, X should answer the request for the next page with an empty page. The panel
+   then says "X returned an empty page, so this is the end of what X will show," and the count
+   stops growing. (Your first capture will confirm that X behaves this way.)
 7. Press **Save file**. The script suggests the account's handle; check it and press OK. Chrome
    saves `x-bookmarks-<handle>-<date>.json` in Downloads. Move it into `~/Downloads/x-bookmarks/`.
 8. Note the panel's post count for this account, then switch to the other account and repeat

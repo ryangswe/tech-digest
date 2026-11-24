@@ -204,23 +204,26 @@ def _is_capture(data) -> bool:
     return isinstance(data, dict) and data.get("format") == CAPTURE_FORMAT
 
 
-def _scan(node, entries: list, bottoms: list) -> None:
+def _scan(node, found: dict) -> None:
     """Collect (key, entry) for each bookmarked post, a timeline entry ("tweet-<id>") holding
-    tweet_results, and the "Bottom" cursors X asks for the next page with. Same rules as
-    `scan` in tools/x-bookmarks-capture.js, so the import's counts match the panel's."""
+    tweet_results; the "Bottom" cursors X asks for the next page with; and whether there is an
+    "instructions" list (a real timeline). Same rules as `scan` in tools/x-bookmarks-capture.js,
+    so the import's counts match the panel's."""
     if isinstance(node, list):
         for n in node:
-            _scan(n, entries, bottoms)
+            _scan(n, found)
     elif isinstance(node, dict):
         content = node.get("content")
         item = content.get("itemContent") if isinstance(content, dict) else None
         if isinstance(node.get("entryId"), str) and isinstance(item, dict) and isinstance(item.get("tweet_results"), dict):
-            entries.append((node["entryId"].removeprefix("tweet-"), node))
+            found["entries"].append((node["entryId"].removeprefix("tweet-"), node))
             return
         if node.get("cursorType") == "Bottom" and isinstance(node.get("value"), str):
-            bottoms.append(node["value"])
+            found["bottoms"].append(node["value"])
+        if isinstance(node.get("instructions"), list):
+            found["timeline"] = True
         for v in node.values():
-            _scan(v, entries, bottoms)
+            _scan(v, found)
 
 
 def _capture_rows(data: dict, name: str) -> tuple[list[dict], dict, list[str]]:
@@ -235,17 +238,26 @@ def _capture_rows(data: dict, name: str) -> tuple[list[dict], dict, list[str]]:
     first_page = reached_end = False
     for p in pages:
         cursor = p.get("cursor")  # None for the first page
-        if not (p.get("status") == 200 and isinstance(p.get("body"), dict)
-                and isinstance(p["body"].get("data"), dict)):
+        if cursor is not None and not isinstance(cursor, str):
+            raise BacklogError(f"{name}: a page's cursor is {cursor!r}, not text. Save the capture again.")
+        body = p.get("body")
+        found = {"entries": [], "bottoms": [], "timeline": False}
+        if isinstance(body, dict) and isinstance(body.get("data"), dict):
+            _scan(body, found)
+        errors = isinstance(body, dict) and isinstance(body.get("errors"), list) and bool(body["errors"])
+        if (p.get("status") != 200 or not (isinstance(body, dict) and isinstance(body.get("data"), dict))
+                or (errors and not found["entries"])):
+            gaps.pop(cursor, None)
             gaps[cursor] = p.get("status")
             continue
-        gaps.pop(cursor, None)
+        gaps.pop(cursor, None)  # a retry of the same page filled the gap
         first_page = first_page or cursor is None
-        entries, next_cursors = [], []
-        _scan(p["body"], entries, next_cursors)
-        if cursor is not None and cursor in bottoms:  # an answer to "next page"; none means the end
-            reached_end = not entries
-        bottoms.update(next_cursors)
+        entries = found["entries"]
+        if cursor is not None and cursor in bottoms and found["timeline"] and not entries:
+            reached_end = True  # X answered "next page" with an empty page
+        elif any(e not in seen for e, _ in entries):
+            reached_end = False  # more posts after an "end": it was not the end
+        bottoms.update(found["bottoms"])
         for entry_id, entry in entries:
             if entry_id in seen:  # the same page arrives twice when X reloads it
                 continue
@@ -268,8 +280,9 @@ def _capture_rows(data: dict, name: str) -> tuple[list[dict], dict, list[str]]:
         warnings.append(f"{name}: the first page (your newest bookmarks) is missing. Follow the "
                         "first-page step in docs/x-bookmarks.md and save again.")
     if gaps:
-        warnings.append(f"{name}: {len(gaps)} page(s) failed and never loaded again (X may be limiting "
-                        "requests). Wait, scroll again and save again.")
+        statuses = ", ".join(sorted({str(s) for s in gaps.values()}))
+        warnings.append(f"{name}: {len(gaps)} page(s) failed (status {statuses}) and never loaded again "
+                        "(X may be limiting requests). Wait, scroll again and save again.")
     if not reached_end:
         warnings.append(f"{name}: X never answered a request for the next page with an empty page, so "
                         "the capture may stop before the end of the list. If you stopped early, scroll to "

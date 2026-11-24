@@ -296,7 +296,7 @@
     "created_at": "2026-05-07 16:00:00 +08:00",
     "full_text": "Great piece on reviewers https://t.co/0050",
     "media": [],
-    "screen_name": "second_dev",
+    "screen_name": "second_dev_fixture",
     "name": "Second_Dev",
     "profile_image_url": null,
     "user_id": "42",
@@ -313,7 +313,7 @@
     "favorited": false,
     "retweeted": false,
     "bookmarked": false,
-    "url": "https://twitter.com/second_dev/status/2100000000000000005",
+    "url": "https://twitter.com/second_dev_fixture/status/2100000000000000005",
     "metadata": {
       "__typename": "Tweet",
       "rest_id": "2100000000000000005",
@@ -323,7 +323,7 @@
             "__typename": "User",
             "rest_id": "42",
             "core": {
-              "screen_name": "second_dev",
+              "screen_name": "second_dev_fixture",
               "name": "Second_Dev"
             }
           }

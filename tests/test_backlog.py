@@ -236,6 +236,32 @@ class CaptureTest(unittest.TestCase):
             _, notes = B.parse_archive(edited_capture(d, refresh))
         self.assertFalse(notes["captures"][0]["reached_end"])
 
+    def test_an_error_answer_is_a_failure_not_the_end(self):
+        def edit(data):  # X answers "next page" with 200, no data and an error: the list goes on
+            data["pages"][1] = {"cursor": "c1", "status": 200,
+                                "body": {"data": {}, "errors": [{"message": "Timeout: Unspecified"}]}}
+            del data["pages"][2:]
+        with TempDir() as d:
+            stats = B.import_archive(edited_capture(d, edit), d / "out")
+        summary = stats["captures"][0]
+        self.assertEqual((summary["failed_pages"], summary["reached_end"]), (1, False))
+        self.assertIn("failed (status 200)", stats["warning"])
+
+    def test_a_page_repeated_after_the_end_keeps_the_end(self):
+        def edit(data):
+            data["pages"].append(data["pages"][1])  # X sends page c1 again after the empty page
+        with TempDir() as d:
+            stats = B.import_archive(edited_capture(d, edit), d / "out")
+        self.assertNotIn("warning", stats)
+        self.assertTrue(stats["captures"][0]["reached_end"])
+
+    def test_a_cursor_that_is_not_text_is_refused(self):
+        with TempDir() as d:
+            path = edited_capture(d, lambda data: data["pages"][1].update(cursor=[1]))
+            with self.assertRaises(B.BacklogError) as e:
+                B.parse_archive(path)
+        self.assertIn("not text", str(e.exception))
+
     def test_same_post_and_article_across_accounts(self):
         """Post 2 links to the same article as post 1, and is saved three times by two accounts."""
         def row(tid, account):
@@ -294,7 +320,7 @@ class CaptureScriptTest(unittest.TestCase):
         self.assertRegex(out["download"], r"^x-bookmarks-acct_alpha-\d{4}-\d{2}-\d{2}\.json$")
         self.assertIn("5 posts from 3 pages", out["panel"])
         self.assertIn("The first page was captured", out["panel"])
-        self.assertIn("this is the end of the list", out["panel"])
+        self.assertIn("this is the end of what X will show", out["panel"])
         saved = out["saved"]
         self.assertEqual((saved["account"], saved["posts_seen"], saved["first_page"], saved["reached_end"]),
                          ("acct_alpha", 5, True, True))
@@ -325,13 +351,25 @@ class CaptureScriptTest(unittest.TestCase):
         self.assertFalse(out["saved"]["first_page"])
 
     @unittest.skipUnless(shutil.which("node"), "needs Node.js to run the browser script")
+    def test_panel_end_needs_an_empty_next_page(self):
+        empty = {"data": {"bookmark_timeline_v2": {"timeline": {"instructions": []}}}}
+        error = {"data": {}, "errors": [{"message": "Timeout: Unspecified"}]}
+        for name, last, failed in (("a refresh of the top", {"cursor": "top1", "status": 200, "body": empty}, False),
+                                   ("an error answer", {"cursor": "c2", "status": 200, "body": error}, True)):
+            with self.subTest(name), TempDir() as d:
+                out = self.run_script(edited_capture(d, lambda data: data["pages"].__setitem__(-1, last)))
+                self.assertNotIn("end of what X will show", out["panel"])
+                self.assertFalse(out["saved"]["reached_end"])
+                self.assertEqual("1 page failed (status 200)" in out["panel"], failed)
+
+    @unittest.skipUnless(shutil.which("node"), "needs Node.js to run the browser script")
     def test_panel_clears_a_failure_that_a_retry_loaded(self):
         def edit(data):
             data["pages"].insert(1, {"cursor": "c1", "status": 429, "body": "Rate limit exceeded"})
         with TempDir() as d:
             out = self.run_script(edited_capture(d, edit))
         self.assertNotIn("failed", out["panel"])
-        self.assertIn("this is the end of the list", out["panel"])
+        self.assertIn("this is the end of what X will show", out["panel"])
 
 
 class RawStaysLocalTest(unittest.TestCase):

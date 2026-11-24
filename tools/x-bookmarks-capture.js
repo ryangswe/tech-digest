@@ -12,12 +12,12 @@
 // using it are in docs/x-bookmarks.md. You paste it into the browser console on x.com, or install
 // it as a local userscript (the header above).
 //
-// What it does: X's Bookmarks page asks X's servers for your bookmarks a page at a time, as you
+// X's Bookmarks page asks X's servers for your bookmarks a page at a time, as you
 // scroll. This script listens for the answers to those requests (the "Bookmarks" GraphQL
 // request) and keeps a copy in this tab's memory. A small panel shows how many posts it has
 // seen. "Save file" downloads everything kept so far as one JSON file.
 //
-// What it does not do: it sends no requests of its own, loads no other code, never scrolls or
+// The script sends no requests of its own, loads no other code, never scrolls or
 // clicks, and changes nothing on the page apart from adding the panel. Requests that are not
 // Bookmarks pass through untouched. Closing or reloading the tab discards what it kept.
 
@@ -33,7 +33,7 @@
   let firstPage = false; // the first page is the request without a cursor
   const bottoms = new Set(); // the "next page" cursors X has handed out
   const gaps = new Map(); // cursor -> status, for failed requests that no retry has answered yet
-  let ended = false; // X answered a "next page" request with no posts: the end of the list
+  let ended = false; // true once X answers a "next page" request with an empty page
   let lastNew = null;
   let lastAdded = null;
   let panel = null;
@@ -49,17 +49,19 @@
   const isBookmarks = (url) => /\/graphql\/[^/]+\/Bookmarks$/.test(parse(url)?.pathname ?? "");
   const cursorOf = (url) => {
     try {
-      return JSON.parse(parse(url).searchParams.get("variables") || "{}").cursor ?? null;
+      const cursor = JSON.parse(parse(url).searchParams.get("variables") || "{}").cursor;
+      return typeof cursor === "string" ? cursor : null;
     } catch {
       return null;
     }
   };
 
-  // What a response holds: post ids (each bookmarked post is a timeline entry, "tweet-<id>",
-  // holding tweet_results) and the "Bottom" cursor that X asks for the next page with.
-  // backlog.py reads saved files with the same rules, so its counts match the panel's.
+  // scan() finds three things in a response. Each bookmarked post is a timeline entry
+  // ("tweet-<id>") holding tweet_results. The "Bottom" cursor is what X asks for the next page
+  // with. An "instructions" list shows the answer is a real timeline. backlog.py reads saved
+  // files with the same rules, so its counts match the panel's.
   const isObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
-  const scan = (node, out = { ids: [], bottoms: [] }) => {
+  const scan = (node, out = { ids: [], bottoms: [], timeline: false }) => {
     if (Array.isArray(node)) node.forEach((n) => scan(n, out));
     else if (isObject(node)) {
       if (typeof node.entryId === "string" && isObject(node.content?.itemContent?.tweet_results)) {
@@ -67,6 +69,7 @@
         return out;
       }
       if (node.cursorType === "Bottom" && typeof node.value === "string") out.bottoms.push(node.value);
+      if (Array.isArray(node.instructions)) out.timeline = true;
       Object.values(node).forEach((v) => scan(v, out));
     }
     return out;
@@ -79,16 +82,19 @@
     } catch {}
     const cursor = cursorOf(url);
     pages.push({ cursor, status, body: body ?? String(text).slice(0, 2000) });
-    if (status !== 200 || !isObject(body) || !isObject(body.data)) {
+    const found = isObject(body) && isObject(body.data) ? scan(body) : null;
+    const errors = Array.isArray(body?.errors) && body.errors.length > 0;
+    if (status !== 200 || !found || (errors && !found.ids.length)) {
+      gaps.delete(cursor); // re-added last, so the panel shows the newest failure's status
       gaps.set(cursor, status);
       return show();
     }
     gaps.delete(cursor); // a retry of the same page filled the gap
     if (cursor === null) firstPage = true;
-    const found = scan(body);
-    if (cursor !== null && bottoms.has(cursor)) ended = found.ids.length === 0;
-    found.bottoms.forEach((c) => bottoms.add(c));
     const fresh = found.ids.filter((id) => !seen.has(id));
+    if (cursor !== null && bottoms.has(cursor) && found.timeline && !found.ids.length) ended = true;
+    else if (fresh.length) ended = false; // more posts after an "end" (it was not the end)
+    found.bottoms.forEach((c) => bottoms.add(c));
     fresh.forEach((id) => seen.add(id));
     if (fresh.length) lastNew = new Date();
     lastAdded = fresh.length;
@@ -164,7 +170,7 @@
     const rows = [`Bookmarks capture has ${seen.size} posts from ${pages.length} pages.`];
     if (!pages.length) rows.push("It is waiting for X to load your bookmarks.");
     else rows.push(firstPage ? "The first page was captured." : "The first page was missed, so see the instructions.");
-    if (ended) rows.push("X returned an empty page, so this is the end of the list.");
+    if (ended) rows.push("X returned an empty page, so this is the end of what X will show.");
     else if (lastAdded !== null) {
       const at = lastNew ? `, and the last new one came at ${lastNew.toLocaleTimeString()}` : "";
       rows.push(`The last page added ${lastAdded} new posts${at}.`);
