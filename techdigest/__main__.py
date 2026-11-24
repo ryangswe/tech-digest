@@ -233,7 +233,7 @@ def cmd_backlog(args) -> int:
     try:
         if args.step == "import":
             if not args.path:
-                print("backlog import needs a path: a folder of capture files (docs/x-bookmarks.md), a twitter-web-exporter JSON file, or an X archive (zip or folder)", file=sys.stderr)
+                print("backlog import needs a path. Give it a folder of capture files (docs/x-bookmarks.md), a twitter-web-exporter JSON file, or an X archive (zip or folder).", file=sys.stderr)
                 return 2
             stats = B.import_archive(Path(args.path), root)
             print(json.dumps(stats, indent=1))

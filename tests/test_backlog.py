@@ -94,15 +94,15 @@ class WebExporterTest(unittest.TestCase):
     def test_quote_and_retweet(self):
         rows, _ = self.rows()
         quote = rows["2100000000000000003"]
-        self.assertIn("[Quoting @writer] Our evals write-up", quote["text"])
+        self.assertIn("[Quoting @writer_fixture] Our evals write-up", quote["text"])
         self.assertEqual(B._primary_link(quote["urls"]), "https://example.org/evals")
         rt = rows["2000000000000000010"]  # a retweet is read as the post it shares
-        self.assertEqual((rt["author"], rt["urls"]), ("onnx_fan", ["https://example.org/onnx-webgpu"]))
+        self.assertEqual((rt["author"], rt["urls"]), ("onnx_fan_fixture", ["https://example.org/onnx-webgpu"]))
         wrapped = rows["2100000000000000007"]  # X wraps some quoted posts in TweetWithVisibilityResults
-        self.assertIn("[Quoting @limited] Agent sandboxing notes", wrapped["text"])
+        self.assertIn("[Quoting @limited_fixture] Agent sandboxing notes", wrapped["text"])
         self.assertEqual(B._primary_link(wrapped["urls"]), "https://example.org/sandboxing")
         gone = rows["2100000000000000008"]  # a retweet of a deleted post keeps the retweet itself
-        self.assertEqual((gone["author"], gone["urls"]), ("booster", []))
+        self.assertEqual((gone["author"], gone["urls"]), ("booster_fixture", []))
 
     def test_import_merges_and_strips_tracking(self):
         with TempDir() as d:
@@ -184,7 +184,7 @@ class CaptureTest(unittest.TestCase):
         alpha = next(c for c in notes["captures"] if c["account"] == "acct_alpha")
         # 5 posts, as the panel counted them: one is a deleted post, and a repeated entry counts once
         self.assertEqual((alpha["pages"], alpha["posts"], alpha["unavailable"]), (3, 5, 1))
-        self.assertTrue(alpha["first_page"] and alpha["ended_on_empty_page"])
+        self.assertTrue(alpha["first_page"] and alpha["reached_end"])
         self.assertEqual(alpha["failed_pages"], 0)
 
     def test_post_shapes(self):
@@ -206,12 +206,46 @@ class CaptureTest(unittest.TestCase):
         def edit(data):
             data["account"] = ""
             data["pages"][0]["cursor"] = "c0"  # the script started after the first page loaded
-            data["pages"].append({"cursor": "c3", "status": 429, "body": "Rate limit exceeded"})
+            data["pages"].pop()  # the owner stopped before X's empty last page
+            data["pages"].append({"cursor": "c2", "status": 429, "body": "Rate limit exceeded"})
+            data["posts_seen"] = 6
         with TempDir() as d:
             stats = B.import_archive(edited_capture(d, edit), d / "out")
-        for words in ("no valid account name", "first page", "1 of 4 responses failed"):
+            summary = stats["captures"][0]
+        for words in ("no valid account name", "first page", "1 page(s) failed", "before the end",
+                      "the panel counted 6 posts but the file holds 5"):
             self.assertIn(words, stats["warning"])
         self.assertEqual(stats["posts_by_account"], {})
+        self.assertEqual((summary["failed_pages"], summary["first_page"], summary["reached_end"]), (1, False, False))
+
+    def test_a_retried_page_clears_its_failure(self):
+        def edit(data):  # page c1 failed, then loaded when the owner scrolled again
+            data["pages"].insert(1, {"cursor": "c1", "status": 429, "body": "Rate limit exceeded"})
+        with TempDir() as d:
+            stats = B.import_archive(edited_capture(d, edit), d / "out")
+        self.assertNotIn("warning", stats)
+        self.assertEqual((stats["captures"][0]["pages"], stats["captures"][0]["failed_pages"]), (4, 0))
+
+    def test_only_an_empty_next_page_is_the_end(self):
+        empty = {"data": {"bookmark_timeline_v2": {"timeline": {"instructions": []}}}}
+
+        def refresh(data):  # no end page; X refreshes the top of the list and finds nothing new
+            data["pages"].pop()
+            data["pages"].append({"cursor": "top1", "status": 200, "body": empty})
+        with TempDir() as d:
+            _, notes = B.parse_archive(edited_capture(d, refresh))
+        self.assertFalse(notes["captures"][0]["reached_end"])
+
+    def test_same_post_and_article_across_accounts(self):
+        """Post 2 links to the same article as post 1, and is saved three times by two accounts."""
+        def row(tid, account):
+            return {"tweet_id": tid, "text": "t", "author": "a_fixture", "created": None,
+                    "urls": ["https://example.org/same"], "account": account}
+        items, stats = B.normalise([row("1", "a"), row("2", "a"), row("2", "b"), row("2", "a")])
+        (item,) = items.values()
+        self.assertEqual((item["also"], item["accounts"]), (["2"], ["a", "b"]))
+        self.assertEqual(stats["merged_duplicates"], 3)
+        self.assertEqual(stats["posts_by_account"], {"a": 2, "b": 1})
 
     def test_newer_version_is_refused(self):
         with TempDir() as d:
@@ -238,15 +272,16 @@ class CaptureScriptTest(unittest.TestCase):
         code = "\n".join(l for l in src.splitlines() if not l.lstrip().startswith("//"))
         for banned in ("import", "require(", "eval(", "Function(", "sendBeacon", "WebSocket", "EventSource",
                        "Worker(", "innerHTML", "insertAdjacentHTML", "document.write", ".send(", "http://",
-                       "https://", "localStorage", "indexedDB", "createElement(\"script"):
+                       "https://", "localStorage", "indexedDB", "createElement(\"script", "Image(", ".src", "window.open",
+                       "XMLHttpRequest(", "postMessage"):
             self.assertNotIn(banned, code, banned)
         self.assertIsNone(re.search(r"scroll(To|By|IntoView)|scrollTop|dispatchEvent", code))  # never drives the page
         # the only fetch call passes the page's own request through
         self.assertEqual(re.findall(r"\w*[Ff]etch\s*\(", code), [])
         self.assertIn("realFetch.apply(this, arguments)", code)
 
-    def run_script(self, capture: Path) -> dict:
-        r = subprocess.run(["node", str(ROOT / "tests/capture_harness.js"), str(capture)],
+    def run_script(self, capture: Path, *extra: str) -> dict:
+        r = subprocess.run(["node", str(ROOT / "tests/capture_harness.js"), str(capture), *extra],
                            capture_output=True, text=True, timeout=30)
         self.assertEqual(r.returncode, 0, r.stderr)
         return json.loads(r.stdout)
@@ -258,10 +293,11 @@ class CaptureScriptTest(unittest.TestCase):
         self.assertEqual(len(out["requests"]), 4)  # the page's own four, nothing added
         self.assertRegex(out["download"], r"^x-bookmarks-acct_alpha-\d{4}-\d{2}-\d{2}\.json$")
         self.assertIn("5 posts from 3 pages", out["panel"])
-        self.assertIn("First page: captured", out["panel"])
-        self.assertIn("this may be the end", out["panel"])
+        self.assertIn("The first page was captured", out["panel"])
+        self.assertIn("this is the end of the list", out["panel"])
         saved = out["saved"]
-        self.assertEqual((saved["account"], saved["posts_seen"], saved["first_page"]), ("acct_alpha", 5, True))
+        self.assertEqual((saved["account"], saved["posts_seen"], saved["first_page"], saved["reached_end"]),
+                         ("acct_alpha", 5, True, True))
         with TempDir() as d:
             (d / "saved.json").write_text(json.dumps(saved))
             rows, notes = B.parse_archive(d / "saved.json")
@@ -269,15 +305,33 @@ class CaptureScriptTest(unittest.TestCase):
         self.assertEqual(notes["warnings"], [])
 
     @unittest.skipUnless(shutil.which("node"), "needs Node.js to run the browser script")
+    def test_json_responses_and_request_objects(self):
+        out = self.run_script(ALPHA, "variants")  # XHR responseType "json"; fetch(new Request(...))
+        self.assertEqual((out["saved"]["posts_seen"], len(out["saved"]["pages"])), (5, 3))
+        self.assertEqual(len(out["requests"]), 4)
+        with TempDir() as d:
+            (d / "saved.json").write_text(json.dumps(out["saved"]))
+            self.assertEqual(B.parse_archive(d / "saved.json")[0], B.parse_archive(ALPHA)[0])
+
+    @unittest.skipUnless(shutil.which("node"), "needs Node.js to run the browser script")
     def test_panel_shows_a_missed_first_page_and_failures(self):
         def edit(data):
             data["pages"][0]["cursor"] = "c0"
+            data["pages"].insert(2, {"cursor": "c9", "status": 429, "body": "Rate limit exceeded"})
+        with TempDir() as d:
+            out = self.run_script(edited_capture(d, edit))
+        self.assertIn("The first page was missed", out["panel"])
+        self.assertIn("1 page failed (status 429)", out["panel"])
+        self.assertFalse(out["saved"]["first_page"])
+
+    @unittest.skipUnless(shutil.which("node"), "needs Node.js to run the browser script")
+    def test_panel_clears_a_failure_that_a_retry_loaded(self):
+        def edit(data):
             data["pages"].insert(1, {"cursor": "c1", "status": 429, "body": "Rate limit exceeded"})
         with TempDir() as d:
             out = self.run_script(edited_capture(d, edit))
-        self.assertIn("First page: missed", out["panel"])
-        self.assertIn("Failed responses: 1 (last status", out["panel"])
-        self.assertFalse(out["saved"]["first_page"])
+        self.assertNotIn("failed", out["panel"])
+        self.assertIn("this is the end of the list", out["panel"])
 
 
 class RawStaysLocalTest(unittest.TestCase):

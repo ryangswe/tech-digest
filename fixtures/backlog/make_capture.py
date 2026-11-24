@@ -3,7 +3,8 @@
 
 Two fictional accounts' files in the shape tools/x-bookmarks-capture.js saves: each page is a
 Bookmarks response as X's web API returns it (timeline entries "tweet-<id>" and cursors). The
-handles, posts and links are made up. What the fixtures exercise:
+handles, posts and links are made up. Page n hands out the cursor "c<n>" for the next page, so a
+later page with that cursor answers it. What the fixtures exercise:
 
 - acct_alpha: a plain post with a link, a post X wraps in TweetWithVisibilityResults, a deleted
   post (tombstone), a retweet (read as the original), a quote, the same page entry twice, and a
@@ -48,9 +49,11 @@ def page(cursor, entries, n):
     return {"cursor": cursor, "status": 200, "body": body}
 
 
-def capture(account, pages):
+def capture(account, pages, posts_seen):
+    """posts_seen is what the panel would have counted: distinct post entries, deleted ones too."""
     return {"format": "tech-digest/x-bookmarks-capture", "version": 1, "account": account,
-            "saved_at": "2026-11-23T18:00:00.000Z", "posts_seen": 0, "first_page": True, "pages": pages}
+            "saved_at": "2026-11-23T18:00:00.000Z", "posts_seen": posts_seen, "first_page": True,
+            "reached_end": True, "pages": pages}
 
 
 A1 = tweet("3100000000000000001", "fixture_dev", "Notes on reviewer agents https://t.co/x",
@@ -61,7 +64,7 @@ A2 = {"__typename": "TweetWithVisibilityResults",
 A3 = {"__typename": "TweetTombstone", "tombstone": {"text": {"text": "This post is unavailable."}}}
 ORIGINAL = tweet("3100000000000000005", "onnx_fixture", "Running ONNX in the browser https://t.co/x",
                  ["https://example.org/onnx-webgpu"])
-A4 = tweet("3100000000000000004", "booster", "RT @onnx_fixture: Running ONNX…",
+A4 = tweet("3100000000000000004", "booster_fixture", "RT @onnx_fixture: Running ONNX…",
            legacy={"retweeted_status_result": {"result": ORIGINAL}})
 QUOTED = tweet("3100000000000000009", "writer_fixture", "Our evals write-up https://t.co/x",
                ["https://example.org/evals"])
@@ -79,12 +82,12 @@ FILES = {
         page("c1", [entry("3100000000000000004", A4), entry("3100000000000000006", A6),
                     entry("3100000000000000001", A1)], 2),
         page("c2", [], 3),
-    ]),
+    ], 5),
     "x-bookmarks-acct_beta-2026-11-23.json": capture("acct_beta", [
         page(None, [entry("3100000000000000001", A1), entry("3100000000000000007", B7),
                     entry("3100000000000000008", B8)], 1),
         page("c1", [], 2),
-    ]),
+    ], 3),
 }
 
 if __name__ == "__main__":

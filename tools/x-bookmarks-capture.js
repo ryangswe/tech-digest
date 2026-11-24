@@ -8,9 +8,9 @@
 // @version      1
 // ==/UserScript==
 //
-// Read this file in full before you run it; it is all the code there is. How to use it:
-// docs/x-bookmarks.md. Paste it into the browser console on x.com, or install it as a local
-// userscript (the header above).
+// Read this file in full before you run it, because it is all the code there is. The steps for
+// using it are in docs/x-bookmarks.md. You paste it into the browser console on x.com, or install
+// it as a local userscript (the header above).
 //
 // What it does: X's Bookmarks page asks X's servers for your bookmarks a page at a time, as you
 // scroll. This script listens for the answers to those requests (the "Bookmarks" GraphQL
@@ -31,10 +31,11 @@
   const pages = []; // one {cursor, status, body} per Bookmarks response, in arrival order
   const seen = new Set(); // post ids seen so far, for the counter
   let firstPage = false; // the first page is the request without a cursor
-  let failed = 0;
+  const bottoms = new Set(); // the "next page" cursors X has handed out
+  const gaps = new Map(); // cursor -> status, for failed requests that no retry has answered yet
+  let ended = false; // X answered a "next page" request with no posts: the end of the list
   let lastNew = null;
   let lastAdded = null;
-  let lastStatus = null;
   let panel = null;
   let line = null;
 
@@ -54,14 +55,19 @@
     }
   };
 
-  // Post ids in a response: each bookmarked post is a timeline entry ("tweet-<id>") that holds
-  // tweet_results; cursors and other entries don't.
-  const postIds = (node, out = []) => {
-    if (Array.isArray(node)) node.forEach((n) => postIds(n, out));
-    else if (node && typeof node === "object") {
-      if (typeof node.entryId === "string" && node.content?.itemContent?.tweet_results) {
-        out.push(node.entryId.replace(/^tweet-/, ""));
-      } else Object.values(node).forEach((v) => postIds(v, out));
+  // What a response holds: post ids (each bookmarked post is a timeline entry, "tweet-<id>",
+  // holding tweet_results) and the "Bottom" cursor that X asks for the next page with.
+  // backlog.py reads saved files with the same rules, so its counts match the panel's.
+  const isObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+  const scan = (node, out = { ids: [], bottoms: [] }) => {
+    if (Array.isArray(node)) node.forEach((n) => scan(n, out));
+    else if (isObject(node)) {
+      if (typeof node.entryId === "string" && isObject(node.content?.itemContent?.tweet_results)) {
+        out.ids.push(node.entryId.replace(/^tweet-/, ""));
+        return out;
+      }
+      if (node.cursorType === "Bottom" && typeof node.value === "string") out.bottoms.push(node.value);
+      Object.values(node).forEach((v) => scan(v, out));
     }
     return out;
   };
@@ -73,14 +79,19 @@
     } catch {}
     const cursor = cursorOf(url);
     pages.push({ cursor, status, body: body ?? String(text).slice(0, 2000) });
-    const ok = status === 200 && body && body.data;
-    if (!ok) failed += 1;
-    if (ok && cursor === null) firstPage = true;
-    const fresh = ok ? postIds(body).filter((id) => !seen.has(id)) : [];
+    if (status !== 200 || !isObject(body) || !isObject(body.data)) {
+      gaps.set(cursor, status);
+      return show();
+    }
+    gaps.delete(cursor); // a retry of the same page filled the gap
+    if (cursor === null) firstPage = true;
+    const found = scan(body);
+    if (cursor !== null && bottoms.has(cursor)) ended = found.ids.length === 0;
+    found.bottoms.forEach((c) => bottoms.add(c));
+    const fresh = found.ids.filter((id) => !seen.has(id));
     fresh.forEach((id) => seen.add(id));
     if (fresh.length) lastNew = new Date();
-    lastAdded = ok ? fresh.length : null;
-    lastStatus = status;
+    lastAdded = fresh.length;
     show();
   };
 
@@ -122,6 +133,7 @@
       saved_at: new Date().toISOString(),
       posts_seen: seen.size,
       first_page: firstPage,
+      reached_end: ended,
       pages,
     };
     const a = document.createElement("a");
@@ -137,7 +149,7 @@
     if (!panel && document.body) {
       panel = document.createElement("div");
       panel.style.cssText =
-        "position:fixed;left:12px;bottom:12px;z-index:2147483647;max-width:360px;padding:10px 12px;" +
+        "position:fixed;right:12px;top:12px;z-index:2147483647;max-width:360px;padding:10px 12px;" +
         "background:#111;color:#fff;border:2px solid #1d9bf0;border-radius:8px;" +
         "font:13px/1.4 system-ui,sans-serif;white-space:pre-line";
       line = document.createElement("div");
@@ -149,14 +161,19 @@
       document.body.append(panel);
     }
     if (!line) return;
-    const rows = [`Bookmarks capture: ${seen.size} posts from ${pages.length} pages`];
-    if (!pages.length) rows.push("Waiting for X to load your bookmarks…");
-    else rows.push(firstPage ? "First page: captured" : "First page: missed (see the instructions)");
-    if (lastAdded !== null) {
-      const at = lastNew ? `, last new post at ${lastNew.toLocaleTimeString()}` : "";
-      rows.push(`Last page added ${lastAdded}${lastAdded === 0 ? " (this may be the end)" : ""}${at}`);
+    const rows = [`Bookmarks capture has ${seen.size} posts from ${pages.length} pages.`];
+    if (!pages.length) rows.push("It is waiting for X to load your bookmarks.");
+    else rows.push(firstPage ? "The first page was captured." : "The first page was missed, so see the instructions.");
+    if (ended) rows.push("X returned an empty page, so this is the end of the list.");
+    else if (lastAdded !== null) {
+      const at = lastNew ? `, and the last new one came at ${lastNew.toLocaleTimeString()}` : "";
+      rows.push(`The last page added ${lastAdded} new posts${at}.`);
     }
-    if (failed) rows.push(`Failed responses: ${failed} (last status ${lastStatus}). Stop and wait.`);
+    if (gaps.size) {
+      const status = [...gaps.values()].pop();
+      const pagesFailed = gaps.size === 1 ? "1 page" : `${gaps.size} pages`;
+      rows.push(`${pagesFailed} failed (status ${status}) and did not load since. Stop, wait, then scroll again.`);
+    }
     line.textContent = rows.join("\n");
   };
 

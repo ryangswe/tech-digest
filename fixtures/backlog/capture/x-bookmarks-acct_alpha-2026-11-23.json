@@ -3,8 +3,9 @@
  "version": 1,
  "account": "acct_alpha",
  "saved_at": "2026-11-23T18:00:00.000Z",
- "posts_seen": 0,
+ "posts_seen": 5,
  "first_page": true,
+ "reached_end": true,
  "pages": [
   {
    "cursor": null,
@@ -182,8 +183,8 @@
                   "__typename": "User",
                   "rest_id": "7",
                   "core": {
-                   "screen_name": "booster",
-                   "name": "booster"
+                   "screen_name": "booster_fixture",
+                   "name": "booster_fixture"
                   }
                  }
                 }

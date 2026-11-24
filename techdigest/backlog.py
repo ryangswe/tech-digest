@@ -204,19 +204,23 @@ def _is_capture(data) -> bool:
     return isinstance(data, dict) and data.get("format") == CAPTURE_FORMAT
 
 
-def _post_entries(node):
-    """(entry key, entry) for each bookmarked post, wherever X nests it: a timeline entry
-    ("tweet-<id>") holding tweet_results. The key matches the browser script's count."""
+def _scan(node, entries: list, bottoms: list) -> None:
+    """Collect (key, entry) for each bookmarked post, a timeline entry ("tweet-<id>") holding
+    tweet_results, and the "Bottom" cursors X asks for the next page with. Same rules as
+    `scan` in tools/x-bookmarks-capture.js, so the import's counts match the panel's."""
     if isinstance(node, list):
         for n in node:
-            yield from _post_entries(n)
+            _scan(n, entries, bottoms)
     elif isinstance(node, dict):
-        content = node.get("content") if isinstance(node.get("entryId"), str) else None
-        if isinstance(content, dict) and "tweet_results" in (content.get("itemContent") or {}):
-            yield node["entryId"].removeprefix("tweet-"), node
-        else:
-            for v in node.values():
-                yield from _post_entries(v)
+        content = node.get("content")
+        item = content.get("itemContent") if isinstance(content, dict) else None
+        if isinstance(node.get("entryId"), str) and isinstance(item, dict) and isinstance(item.get("tweet_results"), dict):
+            entries.append((node["entryId"].removeprefix("tweet-"), node))
+            return
+        if node.get("cursorType") == "Bottom" and isinstance(node.get("value"), str):
+            bottoms.append(node["value"])
+        for v in node.values():
+            _scan(v, entries, bottoms)
 
 
 def _capture_rows(data: dict, name: str) -> tuple[list[dict], dict, list[str]]:
@@ -225,13 +229,23 @@ def _capture_rows(data: dict, name: str) -> tuple[list[dict], dict, list[str]]:
         raise BacklogError(f"{name}: capture version {data.get('version')!r}; this import reads version 1")
     account = str(data.get("account") or "").removeprefix("@")
     pages = [p for p in (data.get("pages") or []) if isinstance(p, dict)]
-    ok = [p for p in pages if p.get("status") == 200 and isinstance(p.get("body"), dict)
-          and p["body"].get("data")]
     rows, seen, unavailable = [], set(), 0
-    posts_per_page = []
-    for p in ok:
-        entries = list(_post_entries(p["body"]))
-        posts_per_page.append(len(entries))
+    bottoms: set[str] = set()  # "next page" cursors handed out so far
+    gaps: dict = {}  # cursor -> status, for failed pages no later retry answered
+    first_page = reached_end = False
+    for p in pages:
+        cursor = p.get("cursor")  # None for the first page
+        if not (p.get("status") == 200 and isinstance(p.get("body"), dict)
+                and isinstance(p["body"].get("data"), dict)):
+            gaps[cursor] = p.get("status")
+            continue
+        gaps.pop(cursor, None)
+        first_page = first_page or cursor is None
+        entries, next_cursors = [], []
+        _scan(p["body"], entries, next_cursors)
+        if cursor is not None and cursor in bottoms:  # an answer to "next page"; none means the end
+            reached_end = not entries
+        bottoms.update(next_cursors)
         for entry_id, entry in entries:
             if entry_id in seen:  # the same page arrives twice when X reloads it
                 continue
@@ -244,19 +258,25 @@ def _capture_rows(data: dict, name: str) -> tuple[list[dict], dict, list[str]]:
                 continue
             rows.append({**_graphql_row(t, entry_id), "account": account or None})
     summary = {"file": name, "account": account or None, "pages": len(pages), "posts": len(seen),
-               "unavailable": unavailable, "failed_pages": len(pages) - len(ok),
-               "first_page": any(p.get("cursor") is None for p in ok),
-               "ended_on_empty_page": bool(posts_per_page) and posts_per_page[-1] == 0}
+               "unavailable": unavailable, "failed_pages": len(gaps), "first_page": first_page,
+               "reached_end": reached_end}
     warnings = []
     if not HANDLE.match(account):
-        warnings.append(f"{name}: no valid account name, so its rows can't be told apart by account. "
-                        "Save the capture again and enter the handle.")
-    if ok and not summary["first_page"]:
+        warnings.append(f"{name}: it has no valid account name, so its rows can't be told apart by "
+                        "account. Save the capture again and enter the handle.")
+    if not first_page:
         warnings.append(f"{name}: the first page (your newest bookmarks) is missing. Follow the "
                         "first-page step in docs/x-bookmarks.md and save again.")
-    if summary["failed_pages"]:
-        warnings.append(f"{name}: {summary['failed_pages']} of {len(pages)} responses failed (X may be "
-                        "limiting requests). Wait, scroll again and save again.")
+    if gaps:
+        warnings.append(f"{name}: {len(gaps)} page(s) failed and never loaded again (X may be limiting "
+                        "requests). Wait, scroll again and save again.")
+    if not reached_end:
+        warnings.append(f"{name}: X never answered a request for the next page with an empty page, so "
+                        "the capture may stop before the end of the list. If you stopped early, scroll to "
+                        "the end and save again. If X stopped loading first, compare the count with yours.")
+    panel = data.get("posts_seen")
+    if isinstance(panel, int) and panel != len(seen):
+        warnings.append(f"{name}: the panel counted {panel} posts but the file holds {len(seen)}.")
     return rows, summary, warnings
 
 

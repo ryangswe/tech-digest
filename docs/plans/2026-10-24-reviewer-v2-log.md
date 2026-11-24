@@ -62,7 +62,10 @@
   - **Resolution:** `tools/x-bookmarks-capture.js` keeps the Bookmarks responses X's page loads
     while the owner scrolls by hand and saves one file per account; it sends nothing and drives
     nothing. `backlog import` reads a folder of these files, tags each row with its account,
-    merges posts across accounts, and reports per-file counts (posts, deleted posts, first page,
-    end reached) so the owner can check them. Instructions are in `docs/x-bookmarks.md`. The
+    merges posts across accounts, and reports per-file counts (posts, deleted posts, unrecovered
+    failures, first page, end reached) so the owner can check them. It also fixes a bug on main:
+    a post saved twice that had been merged into another by its link was added to `also` twice.
+    Missed by: no test imported the same link-merged post twice; added one that also covers two
+    accounts. Instructions are in `docs/x-bookmarks.md`. The
     twitter-web-exporter reader stays. Built on branch `backlog-web-exporter` (fed3e57).
   - **Permanent decision record needed:** Yes (architecture: how bookmarks are captured)

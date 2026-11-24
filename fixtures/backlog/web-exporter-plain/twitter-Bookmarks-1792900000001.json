@@ -28,7 +28,7 @@
     "created_at": "2026-08-04 20:00:00 +08:00",
     "full_text": "skill-lint checks your SKILL.md files https://t.co/0020",
     "media": [],
-    "screen_name": "tool_maker",
+    "screen_name": "tool_maker_fixture",
     "name": "Tool_Maker",
     "profile_image_url": null,
     "user_id": "42",
@@ -45,14 +45,14 @@
     "favorited": false,
     "retweeted": false,
     "bookmarked": true,
-    "url": "https://twitter.com/tool_maker/status/2100000000000000002"
+    "url": "https://twitter.com/tool_maker_fixture/status/2100000000000000002"
   },
   {
     "id": "2100000000000000003",
     "created_at": "2026-07-18 17:30:00 +08:00",
     "full_text": "this is the one to read https://t.co/quoted",
     "media": [],
-    "screen_name": "quoter",
+    "screen_name": "quoter_fixture",
     "name": "Quoter",
     "profile_image_url": null,
     "user_id": "42",
@@ -69,14 +69,14 @@
     "favorited": false,
     "retweeted": false,
     "bookmarked": true,
-    "url": "https://twitter.com/quoter/status/2100000000000000003"
+    "url": "https://twitter.com/quoter_fixture/status/2100000000000000003"
   },
   {
     "id": "2100000000000000004",
     "created_at": "2026-06-03 16:00:00 +08:00",
-    "full_text": "RT @onnx_fan: ONNX in the browser, now with WebGPU\u2026",
+    "full_text": "RT @onnx_fan_fixture: ONNX in the browser, now with WebGPU\u2026",
     "media": [],
-    "screen_name": "booster",
+    "screen_name": "booster_fixture",
     "name": "Booster",
     "profile_image_url": null,
     "user_id": "42",
@@ -93,7 +93,7 @@
     "favorited": false,
     "retweeted": false,
     "bookmarked": true,
-    "url": "https://twitter.com/booster/status/2100000000000000004"
+    "url": "https://twitter.com/booster_fixture/status/2100000000000000004"
   },
   {
     "id": "2100000000000000005",
@@ -124,7 +124,7 @@
     "created_at": "2025-12-07 16:00:00 +08:00",
     "full_text": "hot take: tabs > spaces",
     "media": [],
-    "screen_name": "opinions",
+    "screen_name": "opinions_fixture",
     "name": "Opinions",
     "profile_image_url": null,
     "user_id": "42",
@@ -141,6 +141,6 @@
     "favorited": false,
     "retweeted": false,
     "bookmarked": true,
-    "url": "https://twitter.com/opinions/status/2100000000000000006"
+    "url": "https://twitter.com/opinions_fixture/status/2100000000000000006"
   }
 ]
